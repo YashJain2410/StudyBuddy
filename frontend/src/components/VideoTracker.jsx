@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useAppContext } from "../context/AppContext";
+
+
 import {
   BarChart,
   Bar,
@@ -17,6 +20,9 @@ const INITIAL_COINS = 50;
 const TAB_SWITCH_COST = 5;
 const DAILY_BONUS = 1;
 const STREAK_BONUS = 5;
+
+
+
 
 function loadState() {
   try {
@@ -56,21 +62,143 @@ function extractYouTubeId(urlOrId) {
   return m ? m[1] : null;
 }
 
+
+/// --- API FUNCTIONS FOR TRACKING ---
+const updateBackendCoins = async (loss) => {
+  try {
+    const res = await fetch(`/api/tracking/coins-loss`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ loss }),
+    });
+    const data = await res.json();
+    console.log("🪙 Backend coins synced:", data);
+  } catch (err) {
+    console.error("Error updating backend coins:", err);
+  }
+};
+
+
+const updateBackendCoinsGain = async (userId, amount) => {
+  try {
+    const res = await fetch(`/api/tracking/coins-gain`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ userId, gain: amount }),
+    });
+    const data = await res.json();
+    console.log("✅ Coins added:", data);
+  } catch (err) {
+    console.error("❌ Error adding backend coins:", err);
+  }
+};
+
+
+const updateVideosWatched = async () => {
+  try {
+    const token = localStorage.getItem("token"); // 🧠 get user token
+    const res = await fetch("/api/tracking/videos-watched", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include", // keep cookie if backend uses it
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      // ✅ Update frontend streak immediately
+      setAppState((prev) => ({
+        ...prev,
+        streak: data.streak || prev.streak,
+      }));
+
+      // ✅ Save streak in localStorage (for persistence)
+      localStorage.setItem("streak", data.streak || 0);
+
+      console.log("🔥 Streak updated successfully:", data.streak);
+    } else {
+      console.warn("⚠️ Backend returned error:", data.message);
+    }
+  } catch (err) {
+    console.error("❌ Error updating streak:", err);
+  }
+};
+
+
+const updateVideosSwitched = async (userId) => {
+  try {
+    const res = await fetch("/api/tracking/videos-switched", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ userId }),
+    });
+    const data = await res.json();
+    return data; // ✅ VERY IMPORTANT
+  } catch (err) {
+    console.error("Error updating video switch:", err);
+  }
+};
+
+
+// 🧠 Add this helper function (top of file or utils)
+const updateBackendStreak = async () => {
+  try {
+    const res = await fetch("/api/tracking/videos-watched", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (data.success) {
+      setAppState((prev) => ({
+        ...prev,
+        streak: data.streak,
+        lastDayWatched: data.lastDayWatched,
+      }));
+    }
+  } catch (err) {
+    console.error("⚠️ Error syncing streak:", err);
+  }
+};
+
+
+
+
+
+
+
 // --- VIDEO TRACKER COMPONENT ---
 
 export default function VideoTracker() {
+
+  // --- USER ID FROM LOCAL STORAGE ---
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = storedUser?.id;
+
   // App state
-  const [appState, setAppState] = useState(() => loadState());
+  const { appState, setAppState } = useAppContext();
+  
+
   const [inputUrl, setInputUrl] = useState("");
   const [videoId, setVideoId] = useState(null);
   const [localVideoFile, setLocalVideoFile] = useState(null);
   const [localVideoObjectUrl, setLocalVideoObjectUrl] = useState(null);
+  
+
 
   const [playerReady, setPlayerReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [sessionPlayedSeconds, setSessionPlayedSeconds] = useState(0);
   const [sessionViewsTaken, setSessionViewsTaken] = useState(0);
+
+  const [tabSwitches, setTabSwitches] = useState(0);
+  const [sessionTabSwitches, setSessionTabSwitches] = useState(0);
+  
   const [noteText, setNoteText] = useState("");
   const [tagText, setTagText] = useState("");
   const [weeklyStats, setWeeklyStats] = useState({});
@@ -98,12 +226,53 @@ export default function VideoTracker() {
   const localVideoRef = useRef(null);
   const pollRef = useRef(null);
   const lastSampleRef = useRef(0);
+  const playerRef = useRef(null);
 
   // NEW REFS FOR CAMERA
   const cameraVideoRef = useRef(null);
   const cameraCanvasRef = useRef(null);
   const socketRef = useRef(null);
 
+  const [history, setHistory] = useState([]);
+
+  const loadState = async () => {
+const storedUser = JSON.parse(localStorage.getItem("user"));
+const storedCoins = storedUser?.coins ?? localStorage.getItem("coins") ?? 0;
+const storedStreak = storedUser?.streak ?? localStorage.getItem("streak") ?? 0;
+
+
+return {
+  coins: storedCoins,
+  userId: storedUser?._id || storedUser?.id || null,
+  secondsWatched: 0,
+  focusPoints: 0,
+};
+
+
+
+
+};
+
+
+useEffect(() => {
+const fetchCoins = async () => {
+const user = JSON.parse(localStorage.getItem("user"));
+if (!user) return;
+
+  try {
+    const res = await fetch(`/api/tracking/coins/${user._id || user.id}`);
+    if (!res.ok) throw new Error("Failed to fetch coins");
+    const data = await res.json();
+
+    setAppState((prev) => ({ ...prev, coins: data.coins }));
+    localStorage.setItem("coins", data.coins);
+  } catch (err) {
+    console.error("Coin fetch error:", err);
+  }
+};
+
+fetchCoins();
+}, [setAppState]);
 
   // load YouTube IFrame API
   useEffect(() => {
@@ -112,6 +281,8 @@ export default function VideoTracker() {
     tag.src = "https://www.youtube.com/iframe_api";
     document.body.appendChild(tag);
   }, []);
+
+
 
   // Create/Revoke Object URL for local video file
   useEffect(() => {
@@ -148,6 +319,75 @@ export default function VideoTracker() {
     const t = setTimeout(() => setFocusRemaining((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [focusRemaining, isPlaying]);
+
+useEffect(() => {
+  const fetchHistory = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const res = await fetch("/api/tracking/history", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppState((p) => ({ ...p, history: data.history }));
+        localStorage.setItem("userHistory", JSON.stringify(data.history));
+      }
+    } catch (err) {
+      console.error("Error fetching history:", err);
+    }
+  };
+
+  fetchHistory();
+}, []);
+
+
+
+useEffect(() => {
+  const savedHistory = localStorage.getItem("userHistory");
+  if (savedHistory) {
+    setAppState((prev) => ({
+      ...prev,
+      history: JSON.parse(savedHistory),
+    }));
+  }
+}, []);
+
+useEffect(() => {
+  const fetchWeeklyStats = async () => {
+    const token = localStorage.getItem("token");
+
+    // 🧠 Try loading from cache first (for instant chart)
+    const cached = localStorage.getItem("weeklyStats");
+    if (cached) {
+      try {
+        setWeeklyStats(JSON.parse(cached));
+      } catch {}
+    }
+
+    try {
+      // 🛰 Fetch latest from backend
+      const res = await fetch("/api/tracking/weekly-stats", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setWeeklyStats(data.stats);
+        localStorage.setItem("weeklyStats", JSON.stringify(data.stats));
+      }
+    } catch (err) {
+      console.error("Error fetching weekly stats:", err);
+    }
+  };
+
+  fetchWeeklyStats();
+}, []);
+
+
+
+
 
   // Initialize YT player when videoId is set OR set up local video listeners
   useEffect(() => {
@@ -201,6 +441,7 @@ export default function VideoTracker() {
                 stopPolling();
                 if (state === window.YT.PlayerState.ENDED) {
                   finalizeSession(true);
+                   updateVideosWatched(userId);
                 }
               }
             },
@@ -230,6 +471,7 @@ export default function VideoTracker() {
         setIsPlaying(false);
         stopPolling();
         finalizeSession(true);
+        updateVideosWatched(userId);
       };
       const onTimeUpdate = () => {
         setCurrentTime(videoElement.currentTime);
@@ -273,7 +515,7 @@ export default function VideoTracker() {
       return;
     }
 
-    const socket = io("http://localhost:5000");
+    const socket = io("http://localhost:6000");
     socketRef.current = socket;
 
     socket.on("analysis", (data) => {
@@ -353,220 +595,274 @@ export default function VideoTracker() {
     }
   };
 
-  // Tab switch handling
-  useEffect(() => {
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden" && isPlaying) {
-        setSessionViewsTaken((v) => v + 1);
-        if (focusRemaining && focusRemaining > 0) {
-          setAppState((prev) => ({
-            ...prev,
-            coins: Math.max(0, (prev.coins || 0) - TAB_SWITCH_COST),
-          }));
+ 
+
+
+
+  // --- BACKEND SYNC ON TAB HIDE ---
+// other hooks, states, and helper functions above...
+
+// ✅ Unified visibility handler — only deduct coins if focus timer is running
+// --- Deduct coins if focus timer is running ---
+useEffect(() => {
+  let lastHiddenTime = 0;
+  let tabSwitchTriggered = false; 
+  let timeoutId = null;
+  let lastSwitchTimestamp = 0; // 🧠 prevents backend double fire within same second
+
+  const handleVisibilityChange = async () => {
+    const now = Date.now();
+
+    // ✅ Case: Tab hidden → Deduct once
+    if (document.visibilityState === "hidden" && isPlaying && !tabSwitchTriggered) {
+      // Prevent double-trigger if called twice quickly
+      if (now - lastSwitchTimestamp < 800) return; // 🔒 stops 2 backend calls
+      lastSwitchTimestamp = now;
+
+      tabSwitchTriggered = true; 
+      lastHiddenTime = now;
+
+      if (focusRemaining > 0) {
+        const deducted = TAB_SWITCH_COST;
+
+        try {
+          // ✅ 1. Deduct coins (backend)
+          await updateBackendCoins(deducted);
+
+          // ✅ 2. Update frontend coins
+          setAppState((prev) => {
+            const newCoins = Math.max((prev.coins || 0) - deducted, 0);
+            if (newCoins <= 0) setShowZeroCoinsPopup(true);
+            return { ...prev, coins: newCoins };
+          });
+
+          // ✅ 3. Update backend tab switch (only once)
+          try {
+            await updateVideosSwitched(userId);
+            console.log("📡 Backend tab switch +1 ✅");
+          } catch (e) {
+            console.error("⚠️ Failed backend update:", e);
+          }
+
+          // ✅ 4. Update frontend display (+1)
+          setTabSwitches((prev) => prev + 1);
+          console.log("📊 Local tab switch +1 ✅");
+
+        } catch (e) {
+          console.error("❌ Coin deduction failed:", e);
         }
       }
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-    return () =>
-      document.removeEventListener("visibilitychange", onVisibility);
-  }, [isPlaying, focusRemaining]);
 
-  // Finalize session logic
-  const finalizeSession = (ended = false) => {
-    const currentVideoIdentifier = videoId || localVideoFile?.name;
-    if (!currentVideoIdentifier) return;
-    const secondsWatched = Math.floor(sessionPlayedSeconds);
-    if (secondsWatched <= 0 && sessionViewsTaken === 0) {
+      // ✅ Continue timer; don't reset watched seconds
+      if (sessionPlayedSeconds > 0 && !earnedThisSessionCoins) {
+        finalizeSession(false);
+      }
+      console.log("▶️ Timer continuing normally after tab switch");
+    }
+
+    // ✅ Unlock next switch (after small delay)
+    if (document.visibilityState === "visible") {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        tabSwitchTriggered = false;
+      }, 600);
+    }
+  };
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    clearTimeout(timeoutId);
+  };
+}, [isPlaying, focusRemaining, sessionPlayedSeconds, earnedThisSessionCoins, userId]);
+
+
+const cleanupAfterSession = () => {
+  try {
+    if (playerRef?.current) {
+      playerRef.current.pauseVideo?.();
+      playerRef.current = null;
+    }
+    setSessionPlayedSeconds(0);
+    setSessionViewsTaken(0);
+    console.log("🧹 Focus session cleaned up!");
+  } catch (err) {
+    console.error("Cleanup failed:", err);
+  }
+};
+
+
+
+
+
+  // --- SESSION FINALIZE ---
+// ✅ Finalize and reward focus session
+const finalizeSession = async (ended = false) => {
+  const currentVideoIdentifier = videoId || localVideoFile?.name;
+  if (!currentVideoIdentifier) return;
+
+  const secondsWatched = Math.floor(sessionPlayedSeconds);
+  if (secondsWatched <= 0 && sessionViewsTaken === 0) {
+    cleanupAfterSession();
+    return;
+  }
+
+  // ✅ +1 reward for completing focus session
+  const reward = 1;
+
+  try {
+    console.log("🎬 Finalizing session... checking penalty order");
+
+    // 🕒 Small delay ensures any -5 deduction from tab switch is processed first
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // ✅ Prevent multiple +1 rewards
+    if (earnedThisSessionCoins) {
+      console.log("⚠️ Coins for this session already awarded, skipping duplicate +1");
       cleanupAfterSession();
       return;
     }
 
-    const now = new Date();
-    const newHistoryEntry = {
-      videoId: currentVideoIdentifier,
-      url: videoId ? `https://youtu.be/${videoId}` : `file://${localVideoFile.name}`,
-      watchedAt: now.toISOString(),
-      seconds: secondsWatched,
-      viewsTaken: sessionViewsTaken,
-      notes: noteText || appState.notes?.[currentVideoIdentifier] || "",
-      tag: tagText || "",
+    // ✅ Save +1 coin to backend
+    const res = await fetch("/api/tracking/coins-gain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ userId, gain: reward }),
+    });
+
+    if (!res.ok) throw new Error("Failed to update backend coins");
+    const data = await res.json();
+    console.log("✅ Backend coin update:", data);
+
+    // ✅ Update frontend coin state
+    setAppState((prev) => ({
+      ...prev,
+      coins: (prev.coins || 0) + reward,
+    }));
+    localStorage.setItem("coins", (appState.coins || 0) + reward);
+
+    // ✅ Mark session as rewarded and cleanup
+    setEarnedThisSessionCoins(true);
+    cleanupAfterSession();
+
+    console.log(`🎉 Focus session complete — +${reward} coin saved!`);
+  } catch (error) {
+    console.error("❌ Error finalizing session:", error);
+  }
+
+
+
+
+  const now = new Date();
+  const newHistoryEntry = {
+    videoId: currentVideoIdentifier,
+    url: videoId ? `https://youtu.be/${videoId}` : `file://${localVideoFile.name}`,
+    watchedAt: now.toISOString(),
+    seconds: secondsWatched,
+    viewsTaken: sessionViewsTaken,
+    notes: noteText || appState.notes?.[currentVideoIdentifier] || "",
+    tag: tagText || "",
+  };
+
+  setAppState((prev) => {
+    const stats = { ...(prev.stats || {}) };
+    const prevStat = stats[currentVideoIdentifier] || { totalSeconds: 0, totalViews: 0 };
+    stats[currentVideoIdentifier] = {
+      totalSeconds: prevStat.totalSeconds + secondsWatched,
+      totalViews: prevStat.totalViews + sessionViewsTaken,
     };
 
-    setAppState((prev) => {
-      const stats = { ...(prev.stats || {}) };
-      const prevStat = stats[currentVideoIdentifier] || { totalSeconds: 0, totalViews: 0 };
-      stats[currentVideoIdentifier] = {
-        totalSeconds: prevStat.totalSeconds + secondsWatched,
-        totalViews: prevStat.totalViews + sessionViewsTaken,
-      };
+    let coins = prev.coins ?? INITIAL_COINS;
+    let streak = prev.streak ?? 0;
+    let lastDay = prev.lastDayWatched ? new Date(prev.lastDayWatched) : null;
+    const todayStr = now.toISOString().split("T")[0];
+    const lastDayStr = lastDay ? lastDay.toISOString().split("T")[0] : null;
 
-      let coins = prev.coins ?? INITIAL_COINS;
-      let streak = prev.streak ?? 0;
-      let lastDay = prev.lastDayWatched ? new Date(prev.lastDayWatched) : null;
-      const todayStr = now.toISOString().split("T")[0];
-      const lastDayStr = lastDay ? lastDay.toISOString().split("T")[0] : null;
-
-      if (lastDayStr !== todayStr) {
-        coins += DAILY_BONUS;
-        if (lastDay) {
-          const diff = (now - lastDay) / (1000 * 60 * 60 * 24);
-          if (diff <= 1.5) {
-            streak = (streak || 0) + 1;
-            if (streak > 1) coins += STREAK_BONUS;
-          } else {
-            streak = 1;
-          }
+    if (lastDayStr !== todayStr) {
+      coins += DAILY_BONUS;
+      if (lastDay) {
+        const diff = (now - lastDay) / (1000 * 60 * 60 * 24);
+        if (diff <= 1.5) {
+          streak = (streak || 0) + 1;
+          if (streak > 1) coins += STREAK_BONUS;
         } else {
           streak = 1;
         }
-        lastDay = new Date(now.toISOString().split("T")[0]);
+      } else {
+        streak = 1;
       }
-
-      const notes = { ...(prev.notes || {}) };
-      if (noteText) notes[currentVideoIdentifier] = noteText;
-      const history = [...(prev.history || []), newHistoryEntry];
-
-      return {
-        ...prev,
-        history,
-        stats,
-        notes,
-        coins,
-        streak,
-        lastDayWatched: lastDay ? lastDay.toISOString() : prev.lastDayWatched,
-      };
-    });
-
-    setEarnedThisSessionCoins(true);
-    cleanupAfterSession(ended);
-  };
-
-  // Cleanup after session
-  const cleanupAfterSession = (ended = false) => {
-    try {
-      if (videoId && youtubePlayerRef.current) {
-        youtubePlayerRef.current.pauseVideo();
-        if (ended) {
-          youtubePlayerRef.current.stopVideo();
-          youtubePlayerRef.current.destroy();
-          youtubePlayerRef.current = null;
-        }
-      } else if (localVideoRef.current) {
-        localVideoRef.current.pause();
-        if (ended) {
-          localVideoRef.current.currentTime = 0;
-        }
-      }
-    } catch (e) {}
-
-    setVideoId(null);
-    setLocalVideoFile(null);
-    setYoutubePlayerInstance(null);
-    setIsPlaying(false);
-    setSessionPlayedSeconds(0);
-    setSessionViewsTaken(0);
-    setCurrentTime(0);
-    stopPolling();
-    setFocusRemaining(null);
-    setFocusDuration(null);
-    setIsFocusTimerPending(false);
-    setHasPlaybackStarted(false);
-    setIsFocusTimerPopupMaximized(false);
-  };
-
-  // Event Handlers
-  const handleLoadContent = () => {
-    if (appState.coins <= 0) {
-      setShowZeroCoinsPopup(true);
-      return;
+      lastDay = new Date(now.toISOString().split("T")[0]);
+       // ✅ Backend streak update here
+  if (userId) {
+    updateBackendStreak(userId, streak, lastDay.toISOString());
+  }
     }
-    if (inputUrl.trim()) {
-      const id = extractYouTubeId(inputUrl.trim());
-      if (!id) {
-        alert("Please paste a valid YouTube URL or ID.");
-        return;
-      }
-      setLocalVideoFile(null);
-      setVideoId(id);
-    } else if (localVideoFile) {
-      setVideoId(null);
-    } else {
-      alert("Please paste a YouTube URL or select a local video file.");
-      return;
+
+    const notes = { ...(prev.notes || {}) };
+    if (noteText) notes[currentVideoIdentifier] = noteText;
+    const history = [...(prev.history || []), newHistoryEntry];
+
+    // ✅ Backend sync added here
+    if (!earnedThisSessionCoins && userId) {
+      updateBackendCoins(userId, Math.floor(secondsWatched / 60));
     }
-    setShowTimerPopup(true);
-    setInputUrl("");
-    setIsFocusTimerPopupMaximized(false);
-  };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLocalVideoFile(file);
-      setInputUrl("");
-    }
-  };
-
-  const confirmStartFocus = () => {
-    setFocusDuration(focusMinutes * 60);
-    setIsFocusTimerPending(true);
-    setShowTimerPopup(false);
-  };
-
-  const handleStopSave = () => finalizeSession(false);
-
-  const handleSaveNotes = () => {
-    const currentVideoIdentifier = videoId || localVideoFile?.name;
-    if (!currentVideoIdentifier) return alert("Load a video first");
-    setAppState((prev) => ({
+    return {
       ...prev,
-      notes: { ...(prev.notes || {}), [currentVideoIdentifier]: noteText },
-    }));
-    alert("Notes saved locally");
-  };
+      history,
+      stats,
+      notes,
+      coins,
+      streak,
+      lastDayWatched: lastDay ? lastDay.toISOString() : prev.lastDayWatched,
+    };
+  });
 
-  const purchasePremium = () => {
-    if (!window.confirm("Purchase Premium (demo): add 100 coins?")) return;
-    setAppState((prev) => ({ ...prev, coins: (prev.coins || 0) + 100 }));
-    setShowZeroCoinsPopup(false);
-    alert("Premium purchase successful! 100 coins added.");
-  };
+  setEarnedThisSessionCoins(true);
+  cleanupAfterSession(ended);
+};
 
-  const clearHistory = () => {
-    if (!window.confirm("Clear all history, stats, and notes?")) return;
-    setAppState({
-      history: [],
-      notes: {},
-      stats: {},
-      coins: INITIAL_COINS,
-      streak: 0,
-      lastDayWatched: null,
-    });
-  };
 
   // Data computation
   const computeWeeklyStats = (history) => {
-    const stats = {};
-    history.forEach((h) => {
-      const key = new Date(h.watchedAt).toLocaleDateString();
-      stats[key] = (stats[key] || 0) + Math.floor(h.seconds / 60);
-    });
-    setWeeklyStats(stats);
-  };
+  if (!Array.isArray(history) || history.length === 0) {
+    setWeeklyStats({});
+    return; // ✅ prevents crash if history is undefined or empty
+  }
+
+  const stats = {};
+  history.forEach((h) => {
+    const key = new Date(h.watchedAt).toLocaleDateString();
+    stats[key] = (stats[key] || 0) + Math.floor(h.seconds / 60);
+  });
+
+  setWeeklyStats(stats);
+};
+
 
   const computeLastFiveDays = (history) => {
-    const fiveDaysAgo = Date.now() - 1000 * 60 * 60 * 24 * 5;
-    const recent = history.filter(
-      (h) => new Date(h.watchedAt).getTime() >= fiveDaysAgo
-    );
-    recent.sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
-    setLastFiveDays(recent);
-  };
+  if (!Array.isArray(history)) {
+    console.warn("⚠️ computeLastFiveDays called with invalid history:", history);
+    setLastFiveDays([]); // prevent crash
+    return;
+  }
 
-  useEffect(() => {
+  const fiveDaysAgo = Date.now() - 1000 * 60 * 60 * 24 * 5;
+  const recent = history
+    .filter((h) => new Date(h.watchedAt).getTime() >= fiveDaysAgo)
+    .sort((a, b) => new Date(b.watchedAt) - new Date(a.watchedAt));
+
+  setLastFiveDays(recent);
+};
+
+useEffect(() => {
+  if (appState?.history && Array.isArray(appState.history)) {
     computeWeeklyStats(appState.history);
     computeLastFiveDays(appState.history);
-  }, []);
+  }
+}, [appState.history]);
+
 
   // Save on unload
   useEffect(() => {
@@ -608,6 +904,205 @@ export default function VideoTracker() {
       return `Waiting for valid data...`;
     }
   };
+
+
+  const handleLoadContent = () => {
+  if (!inputUrl && !localVideoFile) {
+    alert("Please provide a video URL or upload a video file first!");
+    return;
+  }
+
+  // Extract YouTube video ID safely
+  if (inputUrl) {
+    const match = inputUrl.match(
+      /(?:v=|\/)([0-9A-Za-z_-]{11})(?:[?&]|$)/
+    );
+
+    if (match && match[1]) {
+      setVideoId(match[1]);
+      setLocalVideoFile(null);
+      setShowTimerPopup(true); // reset local if YouTube chosen
+    } else {
+      alert("Invalid YouTube URL or ID!");
+      return;
+    }
+  }
+
+  // If a local video is selected
+  if (localVideoFile) {
+    setVideoId(null); 
+      setShowTimerPopup(true);// reset YouTube if switching to local
+  }
+};
+
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setLocalVideoFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setLocalVideoObjectUrl(objectUrl);
+    setInputUrl(""); // Clear any YouTube link
+  }
+};
+
+const clearHistory = () => {
+  // Optional: clear backend stats if you’ve implemented an API for it
+  setHistory([]);
+  localStorage.removeItem("videoHistory");
+  console.log("History cleared!");
+};
+
+const confirmStartFocus = () => {
+  if (appState.coins <= 0) {
+    alert("You don’t have enough coins to start a focus session!");
+    return;
+  }
+
+  // Start the focus timer (or any logic you had before)
+  setIsFocusTimerPending(true);
+  setFocusRemaining(focusDuration);
+  console.log("Focus session started!");
+};
+
+
+const fetchWeeklyStats = async () => {
+  const token = localStorage.getItem("token");
+
+  // Try cache first
+  const cached = localStorage.getItem("weeklyStats");
+  if (cached) {
+    try {
+      setWeeklyStats(JSON.parse(cached));
+    } catch {}
+  }
+
+  try {
+    // Fetch from backend
+    const res = await fetch("/api/tracking/weekly-stats", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      setWeeklyStats(data.stats);
+      localStorage.setItem("weeklyStats", JSON.stringify(data.stats));
+    }
+  } catch (err) {
+    console.error("Error fetching weekly stats:", err);
+  }
+};
+
+
+
+
+const handleStopSave = async () => {
+  try {
+    if (youtubePlayerInstance?.pauseVideo) youtubePlayerInstance.pauseVideo();
+    else if (localVideoRef.current && !localVideoRef.current.paused)
+      localVideoRef.current.pause();
+
+    // 🚫 Prevent accidental empty entries
+    if (!sessionPlayedSeconds || sessionPlayedSeconds < 5) {
+      alert("⚠️ You must watch for at least 5 seconds to save a session!");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    const watchedSeconds = Math.round(sessionPlayedSeconds);
+    const totalTabSwitches = tabSwitches;
+
+    console.log("🎬 Saving session:", { videoId, watchedSeconds, totalTabSwitches });
+
+    const response = await fetch("/api/tracking/add-history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        videoId,
+        url: videoId
+          ? `https://youtu.be/${videoId}`
+          : localVideoFile?.name || "Local File",
+        secondsWatched: watchedSeconds,
+        tabSwitches: totalTabSwitches,
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Failed to save session");
+
+    // ✅ Update frontend + localStorage
+    setAppState((prev) => ({
+      ...prev,
+      history: data.history || prev.history,
+    }));
+    localStorage.setItem("userHistory", JSON.stringify(data.history));
+
+  
+
+
+    // ✅ Immediately refresh weekly stats chart here 👇
+    await fetchWeeklyStats();
+
+    // ✅ Now finalize (after saving)
+    finalizeSession(true);
+
+    alert("✅ Session saved successfully!");
+  } catch (error) {
+    console.error("❌ Error saving session:", error);
+  }
+};
+
+
+const handleSaveNotes = () => {
+  if (!noteText.trim()) {
+    alert("Please write something before saving!");
+    return;
+  }
+
+  const currentVideoKey = videoId || localVideoFile?.name;
+  if (!currentVideoKey) {
+    alert("No active video found!");
+    return;
+  }
+
+  setAppState((prev) => ({
+    ...prev,
+    notes: {
+      ...prev.notes,
+      [currentVideoKey]: noteText,
+    },
+  }));
+
+  alert("Notes saved successfully!");
+};
+
+const handleStartFocusTimer = () => {
+  if (!focusMinutes || focusMinutes <= 0) {
+    alert("Please enter a valid focus time!");
+    return;
+  }
+
+  // ⏱️ Start the focus timer
+  setFocusRemaining(focusMinutes * 60);
+
+  // 🔒 Close the popup
+  setShowTimerPopup(false);
+
+  // 🎬 Start video automatically after popup closes
+  setTimeout(() => {
+    if (playerRef.current && playerRef.current.playVideo) {
+      playerRef.current.playVideo(); // for YouTube
+    } else if (localVideoRef.current) {
+      localVideoRef.current.play(); // for local file
+    }
+  }, 500);
+};
+
+
+
 
   return (
     <div style={styles.page}>
@@ -661,6 +1156,15 @@ export default function VideoTracker() {
             >
               Clear All
             </button>
+
+            {/* 🎯 Focus Session Button
+      <button
+       onClick={() => setShowTimerPopup(true)}
+       style={{ ...styles.button, background: "#10b981", marginTop: "10px" }}
+       disabled={appState.coins <= 0}
+      >
+       🎯 Start Focus Session
+</button> */}
           </div>
         </div>
         
@@ -703,6 +1207,9 @@ export default function VideoTracker() {
         </div>
 
 
+        
+
+
         {/* Popups */}
         {showTimerPopup && (
           <div style={styles.popup}>
@@ -728,7 +1235,8 @@ export default function VideoTracker() {
                 <span style={{ fontSize: isFocusTimerPopupMaximized ? '1.2em' : '1em' }}>minutes</span>
               </div>
               <div style={{ marginTop: "16px" }}>
-                <button onClick={confirmStartFocus} style={{ ...styles.button, fontSize: isFocusTimerPopupMaximized ? '1.2em' : '1em' }}>
+                <button onClick={handleStartFocusTimer}
+                  style={{ ...styles.button, fontSize: isFocusTimerPopupMaximized ? '1.2em' : '1em' }}>
                   Set Timer ({focusMinutes} min)
                 </button>
                 <button
@@ -837,14 +1345,11 @@ export default function VideoTracker() {
                   </button>
                 </div>
                 <div style={styles.statsText}>
-                  <div>
-                    Watched:{" "}
-                    <strong>{niceTime(sessionPlayedSeconds)}</strong>
-                  </div>
-                  <div>
-                    Tab Switches: <strong>{sessionViewsTaken}</strong>
-                  </div>
-                </div>
+                   <div>
+                   Watched: <strong>{niceTime(sessionPlayedSeconds)}</strong>
+                    </div>
+                 This Video Tab Switches: <strong>{tabSwitches}</strong>
+               </div>
               </div>
               <div style={{ marginTop: "16px" }}>
                 <textarea
@@ -922,6 +1427,55 @@ export default function VideoTracker() {
             </ResponsiveContainer>
           </div>
         </div>
+
+         {/* 🎬 History Section */}
+<div style={styles.panel}>
+  <h3 style={styles.sectionTitle}>🎬 Last 5 Study Sessions</h3>
+
+  {(appState.history || []).length === 0 ? (
+    <p>No recent study sessions found.</p>
+  ) : (
+    (appState.history || []).map((h, i) => (
+      <div
+        key={i}
+        className="history-card"
+        style={{
+          background: "#f3f4f6",
+          padding: "10px",
+          borderRadius: "10px",
+          marginBottom: "8px",
+        }}
+      >
+        <p>
+          <b>Video:</b>{" "}
+          <a href={h.url} target="_blank" rel="noreferrer">
+            {h.videoId}
+          </a>
+        </p>
+
+        <p>
+          <b>Watched:</b>{" "}
+          {h.secondsWatched >= 60
+            ? `${Math.floor(h.secondsWatched / 60)}m ${h.secondsWatched % 60}s`
+            : `${h.secondsWatched || 0}s`}
+        </p>
+
+        <p>
+          <b>Tab Switches:</b> {h.tabSwitches}
+        </p>
+
+        <p>
+          <b>Date:</b> {new Date(h.watchedAt).toLocaleDateString()}
+        </p>
+      </div>
+    ))
+  )}
+</div>
+
+
+
+
+
       </div>
     </div>
   );

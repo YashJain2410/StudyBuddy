@@ -7,6 +7,10 @@ import { Server } from "socket.io";
 import authRoutes from "./routes/authRoutes.js";
 import { setupDetectionSocket } from "./routes/detectionRoutes.js"; // Import router and socket setup
 import connectDB from "./config/db.js";
+import trackingRoutes from "./routes/trackingRoutes.js";
+
+
+
 
 dotenv.config();
 
@@ -29,12 +33,13 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api/tracking", trackingRoutes);
 
 // Routes
 app.use("/api/auth", authRoutes);
 
 // Connect DB and start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6000;
 
 const startServer = async () => {
   try {

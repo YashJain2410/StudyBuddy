@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext"; // ✅ import context
 
 const Register = () => {
   const navigate = useNavigate();
+  const { setAppState } = useAppContext(); // ✅ context updater
   
   // Form state
   const [formData, setFormData] = useState({
@@ -27,28 +29,39 @@ const Register = () => {
 
   // Handle form submit
   const handleSignup = async (e) => {
-    e.preventDefault();
-    try {
-      // Relative API path, proxy handle karega
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        credentials: "include", // important for cookies
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        // navigate("/dashboard"); // redirect after signup
-        alert("Register Successful");
+  e.preventDefault();
+  try {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      setAppState({ coins: data.user.coins || 50, streak: data.user.streak || 0, name: data.user.name, email: data.user.email, });
+      
+      // 🎉 Welcome bonus alert
+      if (data.user.coins === 50) {
+        alert("Welcome! You’ve received 50 bonus coins 🎊");
       } else {
-        alert(data.message);
+        alert("Register Successful");
       }
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
+
+      navigate("/"); // redirect to home or dashboard
+    } else {
+      alert(data.message);
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-200 to-pink-100 px-6">

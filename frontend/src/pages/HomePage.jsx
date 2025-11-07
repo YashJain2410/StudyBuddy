@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom"; // useNavigate is needed f
 import profileIcon from '../assets/profile_icon.png';
 import AssignmentCard from "../components/AssignmentCard";
 import VideoTracker from "../components/VideoTracker";
+import AuthModal from "../components/AuthModal"; // ✨ NEW: Import the modal
 
 // ------------------- Chatbot Component -------------------
 const Chatbot = () => {
@@ -100,6 +101,7 @@ const HomePage = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false); // ✨ NEW: State for modal
 
   const navigate = useNavigate();
 
@@ -117,18 +119,47 @@ const HomePage = () => {
         });
 
         const data = await res.json();
+        
+        // Remove user from storage & state regardless of API response
+        localStorage.removeItem("user");
+        setUser(null);
+        setDropdownOpen(false);
+
         if (res.ok) {
-            localStorage.removeItem("user");
-            setUser(null);
-            setDropdownOpen(false);
             navigate("/");
         } else {
             console.error("Logout failed:", data.message);
-            alert("Logout failed. Please try again.");
         }
     } catch (error) {
         console.error("Error during logout:", error);
+        // Ensure frontend logout even if server call fails
+        localStorage.removeItem("user");
+        setUser(null);
+        setDropdownOpen(false);
         alert("An error occurred during logout.");
+    }
+  };
+
+  // ✨ NEW: Click handler for all protected links
+  const handleProtectedLinkClick = (e, path) => {
+    if (!user) {
+      // If user is not logged in
+      e.preventDefault(); // Stop the <Link> from navigating
+      setAuthModalOpen(true); // Open the login/signup modal
+    } else if (path === "/chatbot") {
+      // Special case for the AI Chatbot card
+      e.preventDefault(); // Stop navigation
+      setChatOpen(true); // Just open the chat window
+    }
+    // If user is logged in (and path is not /chatbot), the <Link> component will navigate normally.
+  };
+
+  // ✨ NEW: Click handler for the floating chat button
+  const handleChatClick = () => {
+    if (!user) {
+      setAuthModalOpen(true); // Show modal if not logged in
+    } else {
+      setChatOpen(!chatOpen); // Toggle chat window if logged in
     }
   };
 
@@ -163,7 +194,14 @@ const HomePage = () => {
         </Link>
 
         <div className="hidden md:flex gap-8 font-medium">
-          <Link to="/dashboard" className="hover:text-pink-500 transition-colors duration-300">Dashboard</Link>
+          {/* ✨ MODIFIED: Added onClick handler */}
+          <Link 
+            to="/dashboard" 
+            onClick={(e) => handleProtectedLinkClick(e, '/dashboard')} 
+            className="hover:text-pink-500 transition-colors duration-300"
+          >
+            Dashboard
+          </Link>
           <button
             onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
             className="hover:text-pink-500 transition-colors duration-300"
@@ -259,6 +297,7 @@ const HomePage = () => {
             <Link
               to={f.link}
               key={idx}
+              onClick={(e) => handleProtectedLinkClick(e, f.link)} // ✨ MODIFIED: Added onClick
               className="p-8 rounded-3xl bg-white/20 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition-all duration-300"
             >
               <div className="text-5xl mb-4">{f.icon}</div>
@@ -328,7 +367,7 @@ const HomePage = () => {
             </ul>
             <Link
               to="/register"
-              className="mt-6 inline-block px-6 py-3 bg-gradient-to-r from-indigo-700 to-pink-600 text-white rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
+              className="mt-6 inline-block px-6 py-3 bg-gradient-to-r from-indigo-7A00 to-pink-600 text-white rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
             >
               Get Started
             </Link>
@@ -400,9 +439,10 @@ const HomePage = () => {
           <div>
             <h4 className="font-semibold mb-3 text-white">Product</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/reminders" className="hover:text-white">Reminders</Link></li>
-              <li><Link to="/assignments" className="hover:text-white">Assignments</Link></li>
-              <li><Link to="/analytics" className="hover:text-white">Analytics</Link></li>
+              {/* ✨ MODIFIED: Added onClick handlers */}
+              <li><Link to="/reminders" onClick={(e) => handleProtectedLinkClick(e, '/reminders')} className="hover:text-white">Reminders</Link></li>
+              <li><Link to="/assignments" onClick={(e) => handleProtectedLinkClick(e, '/assignments')} className="hover:text-white">Assignments</Link></li>
+              <li><Link to="/analytics" onClick={(e) => handleProtectedLinkClick(e, '/analytics')} className="hover:text-white">Analytics</Link></li>
             </ul>
           </div>
           <div>
@@ -450,13 +490,18 @@ const HomePage = () => {
     </div>
   )}
   <button
-    onClick={() => setChatOpen(!chatOpen)}
+    onClick={handleChatClick} // ✨ MODIFIED: Use new handler
     className="w-16 h-16 rounded-full bg-indigo-700 shadow-xl flex items-center justify-center text-white text-2xl hover:bg-indigo-800 transition-colors"
   >
     💬
   </button>
 </div>
 
+      {/* ✨ NEW: Render the modal component */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+      />
 
       {/* Animation style */}
       <style>{`

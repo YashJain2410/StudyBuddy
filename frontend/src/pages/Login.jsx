@@ -1,10 +1,15 @@
 import React, { useState } from "react";
+import { useAppContext } from "../context/AppContext";
+
 import { Link, useNavigate } from "react-router-dom";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { setAppState } = useAppContext();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,12 +22,19 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/"); // redirect after login
-      } else {
-        alert(data.message);
-      }
+     if (res.ok) {
+     localStorage.setItem("user", JSON.stringify(data.user));
+
+     if (data.token) localStorage.setItem("token", data.token);
+
+       setAppState({ coins: data.user.coins, streak: data.user.streak || 0, name: data.user.name, email: data.user.email, });
+
+     alert(`Welcome back, ${data.user.name}! Coins: ${data.user.coins}`);
+     navigate("/"); 
+    } else {
+    alert(data.message);
+   }
+
     } catch (err) {
       console.error(err);
       alert("Server error");

@@ -8,6 +8,7 @@ import RemindersPanel from "./components/RemindersPanel"; // ✅ yaha import kar
 import ChatBot from "./components/ChatBot";
 import AssignmentCard from "./components/AssignmentCard";
 import Blog from "./components/blogs";
+import AuthModal from "./components/AuthModal";
 
 
   
@@ -25,6 +26,7 @@ function App() {
         <Route path="/reminders" element={<RemindersPanel />} /> {/* ✅ route */}
         <Route path="/assignments" element={<AssignmentCard/>} />
         <Route path="/blogs" element={<Blog />} />
+        <Route path="/authmodal" element={<AuthModal />} />
         
       </Routes>
     </BrowserRouter>

@@ -4,75 +4,75 @@ import { Link } from 'react-router-dom';
 const initialBlogPosts = [
     {
         id: 1,
-        title: "Mastering Pomodoro!",
+        title: "AI is Changing the Way We Learn!",
         author: "Ananya Sharma",
         image: "",
-        excerpt: "Learn how to optimize and elevate your study-sessions with the Pomodoro technique. It's a game-changer for focus and productivity. I've been using this for a while and it really helps me to study.",
-        fullContent: "The Pomodoro Technique is a time management method developed by Francesco Cirillo in the late 1980s. The technique uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. The name Pomodoro comes from the Italian word for tomato, after the tomato-shaped kitchen timer Cirillo used as a university student. The core principle is to work in focused, uninterrupted sprints, which helps to combat procrastination and maintain a high level of concentration. After four 'pomodoros,' you take a longer break. It's an incredibly effective way to manage your time and tackle complex tasks."
+        excerpt: "ISRO’s latest space mission reminds us how science, teamwork, and dreams can take India and young minds beyond the stars.",
+        fullContent: "Today I came across an AI-powered study app that tracks your focus level, mood, and even how long you stay distracted — and then creates a personalized study plan for you! It felt like having a private digital mentor who actually understands how your brain works. The app suggested short breaks when my attention dropped and encouraged me to revise difficult topics when my mind was fresh. I realized that artificial intelligence isn’t just about robots or coding — it’s about making learning smarter, faster, and more human. The future classrooms might not even need fixed timetables; they’ll adjust to how we learn best. Isn’t that amazing? 🤖✨"
     },
     {
         id: 2,
-        title: "Effective Study Habits",
+        title: "India’s Rocket Launch – What a Proud Moment!",
         author: "Rajesh Kumar",
         image: "",
-        excerpt: "Setting up a solid study routine can be tough, but with these simple tips, you'll be on your way to success. Remember, consistency is key!",
-        fullContent: "Developing effective study habits is crucial for academic success. One of the most important habits is to create a consistent study schedule. By dedicating specific times each day or week to your studies, you build a routine that your brain can follow. Another key habit is active recall—instead of just re-reading your notes, try to remember the information without looking at them. This strengthens your memory and helps you identify areas you need to review more. Finally, don't forget the importance of breaks. Short breaks can prevent burnout and improve your focus when you return to your work."
+        excerpt: "ISRO’s latest space mission reminds us how science, teamwork, and dreams can take India and young minds beyond the stars.!",
+        fullContent: "Last night, I watched ISRO’s latest rocket launch live on YouTube, and I couldn’t take my eyes off the screen! The countdown, the fire, the takeoff — it was pure magic. The scientists behind it worked for months, maybe years, for those few incredible seconds. It made me think about how much patience and teamwork science really needs. Every small calculation matters. Watching that rocket fly into space gave me goosebumps and filled me with pride. It reminded me that when we study hard and stay curious, we too can reach for the stars — literally! 🌌🇮🇳"
     },
     {
         id: 3,
-        title: "Exam Prep Hacks",
+        title: "Climate Change: Our Responsibility Too",
         author: "Rishabh Singh",
         image: "",
-        excerpt: "Ace your exams with these simple, yet powerful tips. From creating a study plan to managing stress, you'll be well-prepared.",
-        fullContent: "Preparing for exams can be stressful, but with the right approach, you can feel confident and ready. Start by creating a detailed study plan that breaks down your material into manageable chunks. Use mind maps or flashcards to help you visualize complex topics and concepts. Don't pull all-nighters; get plenty of sleep as it's essential for memory consolidation. Finally, practice with past papers. This not only helps you understand the format of the exam but also allows you to manage your time effectively during the test. Stay calm and trust the process!"
+        excerpt: "Global warming is rising faster than ever — and it’s time for students to lead change through awareness, innovation, and daily eco-friendly habits.",
+        fullContent: "While researching for my environmental science project, I found out that 2025 has already recorded some of the hottest months in human history. Forest fires, melting glaciers, and rising sea levels are no longer distant headlines — they’re happening right now. It honestly made me pause and think: if we, the students of today, don’t take responsibility, who will? I’ve started doing small things like using metal bottles instead of plastic, turning off lights when not needed, and encouraging my friends to do the same. These small habits may seem minor, but together they can make a big difference. 🌱💚"
     },
     {
         id: 4,
-        title: "Coding for Beginners",
+        title: "Imagine Studying in the Metaverse!",
         author: "Anjilesh Sharma",
         image: "",
-        excerpt: "Start your coding journey with these easy-to-follow steps. It’s not as hard as you think, and with practice, you'll be a pro in no time.",
-        fullContent: "Starting to code can seem intimidating, but the journey is exciting and rewarding. Begin with a high-level language like Python, as its syntax is easy to read and understand. Don't get stuck on one concept; start building small projects as early as possible. This practical application will help you learn much faster than just reading theory. Join online communities or forums where you can ask questions and learn from others' experiences. And remember, every programmer, even the most experienced ones, started with 'Hello, World!'."
+        excerpt: "Virtual classrooms in the metaverse will let students explore planets, atoms, and history like real-life adventures — turning learning into pure experience.",
+        fullContent: "I read this fascinating article about the future of virtual education, and it blew my mind. Imagine wearing a VR headset and attending a biology class inside a 3D model of the human body, or learning about planets while floating in a simulated solar system! That’s what metaverse learning promises — immersive, interactive, and super fun classes. You wouldn’t just read about a volcano; you’d actually walk around one (virtually). This idea made me realize how learning could soon become an adventure rather than a task. It’s like science fiction slowly turning into science fact! 🌐✨"
     },
     {
         id: 5,
-        title: "Healthy Eating for a Healthy Mind",
+        title: "When Coding Feels Like Magic",
         author: "Priya Das",
         image: "",
-        excerpt: "Eating healthy isn't just for your body—it's vital for your brain too! Learn which foods can boost your memory and concentration.",
-        fullContent: "What you eat can have a huge impact on your ability to focus and remember information. Foods rich in Omega-3 fatty acids, like salmon and walnuts, are great for brain health. Berries and dark leafy greens are packed with antioxidants that can help protect your brain from stress. Make sure to stay hydrated as well, as even mild dehydration can affect your cognitive performance. A well-balanced diet is the foundation for a sharp and healthy mind."
+        excerpt: "Every student who codes feels the thrill of creation — transforming logical lines into ideas, tools, and digital worlds that inspire others.",
+        fullContent: "Today I wrote my first real piece of code that actually worked — an AI chatbot that replied to my questions. At first, it was just random lines of text and logic that made no sense. But when it finally responded correctly, I literally jumped out of my chair! It felt like I made a machine understand me. That moment made me realize how creative coding can be. You’re not just typing commands; you’re building something that can think, calculate, and even communicate. For the first time, I felt what it means to create with logic — and it felt like magic. 💻💫"
     },
     {
         id: 6,
-        title: "Staying Organized with Digital Tools",
+        title: "New Education Policy: Focusing on Real Learning",
         author: "Liam Chen",
         image: "",
-        excerpt: "Tired of a cluttered desk and a messy schedule? Explore a range of digital tools and apps that can help you stay organized effortlessly.",
-        fullContent: "In today's digital world, staying organized has never been easier. Apps like Trello and Asana are fantastic for managing tasks and projects. For note-taking, tools like Evernote and OneNote let you keep all your notes, ideas, and research in one place. Using a digital calendar like Google Calendar or Outlook can help you schedule your study sessions, classes, and social events, ensuring you never miss a deadline. By leveraging these tools, you can streamline your life and reduce stress."
+        excerpt: "India’s new education system encourages creativity, skill-building, and curiosity — helping students grow beyond marks into confident, capable learners.",
+        fullContent: "Recently, I read about the new education policy that’s being introduced in India. It focuses on skill development, creativity, and real-world understanding instead of rote learning and exams. As a student, that really excited me! I’ve always felt that grades don’t fully define what we’re capable of. The new policy encourages us to explore, question, and create rather than memorize and repeat. If schools start implementing it well, students will finally get the freedom to follow their passion — be it art, coding, music, or science — without fear of being judged just by marks. 📚🌟"
     },
     {
         id: 7,
-        title: "The Art of Stress Management",
+        title: "A Science Fair Surprise!",
         author: "Aisha Chetry",
         image: "",
-        excerpt: "Exams and deadlines can be stressful. Learn simple breathing exercises and mindfulness techniques to keep calm and focused.",
-        fullContent: "Managing stress is a key skill for any student. When you feel overwhelmed, taking a few minutes for deep breathing exercises can calm your nervous system. Mindfulness and meditation can help you stay present and reduce anxiety. It's also important to get regular physical activity, as exercise is a powerful stress-reliever. Don't be afraid to take a break and do something you enjoy, whether it's listening to music, talking to a friend, or going for a walk. Prioritizing your mental health is just as important as academic preparation."
+        excerpt: "Innovation starts small — even a simple banana battery can light up curiosity, creativity, and the spirit of discovery in every student.",
+        fullContent: "During our annual school science fair, a junior student built a banana battery that could actually light up a small bulb! 🍌⚡ Everyone was amazed, and I couldn’t stop smiling. It was such a creative way to show how simple chemistry can generate real electricity. What impressed me most wasn’t just the idea, but the confidence with which the student explained it. That project reminded me that innovation doesn’t always need expensive equipment — it starts with curiosity, imagination, and the courage to experiment. Science isn’t just for geniuses; it’s for anyone who’s curious enough to try. 🔬"
     },
     {
         id: 8,
-        title: "Effective Time Blocking",
+        title: "AI Drawing Tools Are Getting Crazy Good!",
         author: "Eshan Cher",
         image: "",
-        excerpt: "Struggling to find enough time in the day? Time blocking is a simple method that can help you maximize productivity and achieve your goals.",
-        fullContent: "Time blocking is a time management method that involves planning out every moment of your day in advance and assigning specific tasks to specific time slots. By scheduling not just your classes and appointments, but also your study sessions, breaks, and even leisure activities, you create a structured plan for your day. This technique helps you to focus on one task at a time, preventing multitasking and improving your concentration. It also gives you a clear sense of progress and accomplishment as you check off each block of time."
+        excerpt: "AI art generators are teaching us how machines can be creative too — blending imagination, design, and technology like never before.",
+        fullContent: "Today, I tried an AI art generator for fun. I just typed “a robot studying under the stars,” and within seconds it created a breathtaking digital painting! The colors, lighting, and composition were so good that it was hard to believe a machine made it. It made me realize how much technology is evolving — not just in logic, but in creativity too. AI tools are helping artists, students, and even teachers visualize ideas that were once hard to imagine. Maybe one day, AI and humans will co-create masterpieces together. 🎨🤖."
     },
     {
         id: 9,
-        title: "Finding Your Passion in Learning",
+        title: "FStudents and Space: The Next Big Dream",
         author: "Sara Khan",
         image: "",
-        excerpt: "Sometimes, studying feels like a chore. Discover how to connect with your subjects on a deeper level and ignite your passion for learning.",
-        fullContent: "Finding a passion for what you're studying can make a world of difference. Try to connect what you're learning to your personal interests or career goals. For example, if you're studying history, find a documentary or a historical novel that brings the era to life. If you're studying science, look for real-world applications of the concepts you're learning. Engaging with the material in a personal way makes it more meaningful and enjoyable. When you're passionate, studying no longer feels like a task but a journey of discovery."
+        excerpt: "From school projects to mini satellites, young innovators worldwide are exploring the universe — proving that space belongs to dreamers too.",
+        fullContent: "More and more students around the world are joining space clubs, robotics teams, and even satellite design programs. I recently read about a group of Indian students who helped design a mini satellite that was actually launched into orbit by ISRO! Isn’t that incredible? It shows that age doesn’t matter when it comes to innovation — curiosity does. I’ve started following such stories for motivation, and now I dream of contributing to something big too — maybe not a rocket, but perhaps an idea that reaches space someday. 🚀🌠."
     }
 ];
 

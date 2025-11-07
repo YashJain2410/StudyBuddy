@@ -185,5 +185,5 @@ def fetch_report_from_file(filename="report.json"):
     except Exception as e:
         return {"error": f"Failed to read report file: {e}"}
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     get_ai_response()
