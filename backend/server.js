@@ -11,6 +11,10 @@ import trackingRoutes from "./routes/trackingRoutes.js";
 import detectorRoutes from "./routes/detectorRoutes.js";
 import path from "path";
 import reportRoutes from "./routes/reportRoutes.js";
+import userTaskRoutes from "./routes/userTaskRoutes.js";
+import assignmentRoutes from "./routes/assignmentRoutes.js";
+import hackathonRoutes from "./routes/hackathonRoutes.js";
+import reminderRoutes from "./routes/reminderRoutes.js";
 import { fileURLToPath } from "url";
 
 
@@ -50,6 +54,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/detector", detectorRoutes);
 // app.use("/api/detector", detectorControlRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/user-tasks", userTaskRoutes);
+app.use("/api/assignments", assignmentRoutes);
+app.use("/api/hackathons", hackathonRoutes);
+app.use("/api/reminders", reminderRoutes);
 
 app.use(
   "/uploads",
@@ -66,7 +74,7 @@ const startServer = async () => {
 
     // === ADD THIS LINE HERE ===
     // This activates the socket logic from your routes file.
-    
+
 
     httpServer.listen(PORT, () => {
       console.log(`✅ Server running on http://localhost:${PORT}`);

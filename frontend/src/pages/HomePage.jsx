@@ -6,27 +6,25 @@ import VideoTracker from "../components/VideoTracker";
 import AuthModal from "../components/AuthModal"; // ✨ NEW: Import the modal
 import Leaderboard from "../components/Leaderboard";
 import Lottie from "lottie-react";
-import chatAnimation from "../assets/chatAnimation.json"; 
+import chatAnimation from "../assets/chatAnimation.json";
 import ankit from "../assets/ankit1.jpeg"
 import anshika from "../assets/anshika1.jpeg"
 import ananya from "../assets/ananya1.jpeg"
 import setu from "../assets/setu1.jpeg"
 
 
-
-
 // ------------------- Chatbot Component -------------------
 const Chatbot = () => {
- const [messages, setMessages] = useState([
-  { sender: "bot", text: "Hey there! I’m StudyBuddy AI 🤖, your personal study companion." },
-  { sender: "bot", text: "My goal is to help you stay organized and motivated." },
-  { sender: "bot", text: "Here's what I can do:" },
-  { sender: "bot", text: "1. Give you quick study tips." },
-  { sender: "bot", text: "2. Track your learning progress." },
-  { sender: "bot", text: "3. Help manage your assignments and reminders." },
-  { sender: "bot", text: "4. Provide analytics to visualize your study streaks." },
-  { sender: "bot", text: "What's on your mind? Just type your question or choose from the options below!" },
-]);
+  const [messages, setMessages] = useState([
+    { sender: "bot", text: "Hey there! I’m StudyBuddy AI 🤖, your personal study companion." },
+    { sender: "bot", text: "My goal is to help you stay organized and motivated." },
+    { sender: "bot", text: "Here's what I can do:" },
+    { sender: "bot", text: "1. Give you quick study tips." },
+    { sender: "bot", text: "2. Track your learning progress." },
+    { sender: "bot", text: "3. Help manage your assignments and reminders." },
+    { sender: "bot", text: "4. Provide analytics to visualize your study streaks." },
+    { sender: "bot", text: "What's on your mind? Just type your question or choose from the options below!" },
+  ]);
   const [input, setInput] = useState("");
 
   const responses = {
@@ -60,11 +58,10 @@ const Chatbot = () => {
         {messages.map((m, idx) => (
           <div
             key={idx}
-            className={`p-2 rounded-lg max-w-[80%] ${
-              m.sender === "bot"
-                ? "bg-indigo-100 text-gray-900 self-start rounded-bl-none"
-                : "bg-indigo-700 text-white self-end rounded-br-none"
-            }`}
+            className={`p-2 rounded-lg max-w-[80%] ${m.sender === "bot"
+              ? "bg-indigo-100 text-gray-900 self-start rounded-bl-none"
+              : "bg-indigo-700 text-white self-end rounded-br-none"
+              }`}
           >
             {m.text}
           </div>
@@ -112,6 +109,7 @@ const HomePage = () => {
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isAuthModalOpen, setAuthModalOpen] = useState(false); // ✨ NEW: State for modal
+  const [isDashboardModalOpen, setDashboardModalOpen] = useState(false); // ✨ NEW: Dashboard modal state
 
   const navigate = useNavigate();
 
@@ -119,34 +117,34 @@ const HomePage = () => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) setUser(storedUser);
   }, []);
-  
+
   const handleLogout = async () => {
     try {
-        const res = await fetch("/api/auth/logout", {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-        });
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
 
-        const data = await res.json();
-        
-        // Remove user from storage & state regardless of API response
-        localStorage.removeItem("user");
-        setUser(null);
-        setDropdownOpen(false);
+      const data = await res.json();
 
-        if (res.ok) {
-            navigate("/");
-        } else {
-            console.error("Logout failed:", data.message);
-        }
+      // Remove user from storage & state regardless of API response
+      localStorage.removeItem("user");
+      setUser(null);
+      setDropdownOpen(false);
+
+      if (res.ok) {
+        navigate("/");
+      } else {
+        console.error("Logout failed:", data.message);
+      }
     } catch (error) {
-        console.error("Error during logout:", error);
-        // Ensure frontend logout even if server call fails
-        localStorage.removeItem("user");
-        setUser(null);
-        setDropdownOpen(false);
-        alert("An error occurred during logout.");
+      console.error("Error during logout:", error);
+      // Ensure frontend logout even if server call fails
+      localStorage.removeItem("user");
+      setUser(null);
+      setDropdownOpen(false);
+      alert("An error occurred during logout.");
     }
   };
 
@@ -160,6 +158,10 @@ const HomePage = () => {
       // Special case for the AI Chatbot card
       e.preventDefault(); // Stop navigation
       setChatOpen(true); // Just open the chat window
+    } else if (path === "/reminders") {
+      // ✨ NEW: Smart Reminders opens the full-screen dashboard modal
+      e.preventDefault();
+      setDashboardModalOpen(true);
     }
     // If user is logged in (and path is not /chatbot), the <Link> component will navigate normally.
   };
@@ -205,9 +207,9 @@ const HomePage = () => {
 
         <div className="hidden md:flex gap-8 font-medium">
           {/* ✨ MODIFIED: Added onClick handler */}
-          <Link 
-            to="/dashboard" 
-            onClick={(e) => handleProtectedLinkClick(e, '/dashboard')} 
+          <Link
+            to="/dashboard"
+            onClick={(e) => handleProtectedLinkClick(e, '/dashboard')}
             className="hover:text-pink-500 transition-colors duration-300"
           >
             Dashboard
@@ -298,7 +300,7 @@ const HomePage = () => {
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10 text-center">
           {[
             { icon: "🎥", title: "Video Tracker", desc: "Log study videos and monitor progress effortlessly.", link: "/videos" },
-            { icon: "⏰", title: "Smart Reminders", desc: "Never miss a session with intelligent notifications.", link: "/reminders" },
+            { icon: "🎯", title: "Focus Score Dashboard", desc: "Track your real-time focus analytics and session insights.", link: "/reminders" },
             { icon: "🤖", title: "AI Chatbot", desc: "Instant help, Q&A, and motivation while studying.", link: "/chatbot" },
             { icon: "📊", title: "Analytics", desc: "Visualize your learning trends and stay consistent.", link: "/analytics" },
             { icon: "📝", title: "Assignments", desc: "Organize, track, and submit assignments on time.", link: "/assignments" },
@@ -308,11 +310,14 @@ const HomePage = () => {
               to={f.link}
               key={idx}
               onClick={(e) => handleProtectedLinkClick(e, f.link)} // ✨ MODIFIED: Added onClick
-              className="p-8 rounded-3xl bg-white/20 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition-all duration-300"
+              className="p-8 rounded-3xl bg-white/20 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl transform hover:-translate-y-3 transition-all duration-300 flex flex-col items-center"
             >
               <div className="text-5xl mb-4">{f.icon}</div>
               <h3 className="text-xl font-semibold text-gray-900">{f.title}</h3>
               <p className="text-gray-800 mt-2">{f.desc}</p>
+              {f.link === "/reminders" && (
+                <span className="mt-4 text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Open Dashboard Dash →</span>
+              )}
             </Link>
           ))}
         </div>
@@ -402,56 +407,56 @@ const HomePage = () => {
         </div>
       </section>
 
-     {/* About Us Section */}
-<section id="about" className="py-16 text-center bg-white/50 backdrop-blur-lg relative z-10">
-  <h2 className="text-3xl font-bold text-gray-900">ABOUT US</h2>
-  <p className="mt-3 text-gray-800 max-w-2xl mx-auto">
-    We are a passionate team dedicated to making self-learning more effective and engaging.
-    Our mission is to provide students with the right tools, structure, and motivation 
-    to achieve their goals without distractions.
-  </p>
+      {/* About Us Section */}
+      <section id="about" className="py-16 text-center bg-white/50 backdrop-blur-lg relative z-10">
+        <h2 className="text-3xl font-bold text-gray-900">ABOUT US</h2>
+        <p className="mt-3 text-gray-800 max-w-2xl mx-auto">
+          We are a passionate team dedicated to making self-learning more effective and engaging.
+          Our mission is to provide students with the right tools, structure, and motivation
+          to achieve their goals without distractions.
+        </p>
 
-  <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto px-6">
-    
-    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-     <img
-  src={ananya}
-  alt="Team Member"
-  className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover"
-/>
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto px-6">
 
-      <h3 className="mt-4 text-xl font-semibold text-gray-900">Ananya Srivastava</h3>
-      <p className="text-gray-600 text-sm">Backend Developer</p>
-    </div>
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <img
+              src={ananya}
+              alt="Team Member"
+              className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover"
+            />
 
-    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-      <img src={anshika} alt="Team Member"
-  className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover" />
-      <h3 className="mt-4 text-xl font-semibold text-gray-900">Anshika Jain</h3>
-      <p className="text-gray-600 text-sm">Frontend Designer</p>
-    </div>
+            <h3 className="mt-4 text-xl font-semibold text-gray-900">Ananya Srivastava</h3>
+            <p className="text-gray-600 text-sm">Backend Developer</p>
+          </div>
 
-    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-     <img 
-  src={ankit}
-  alt="Team Member"
-  className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover object-top"
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <img src={anshika} alt="Team Member"
+              className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover" />
+            <h3 className="mt-4 text-xl font-semibold text-gray-900">Anshika Jain</h3>
+            <p className="text-gray-600 text-sm">Frontend Designer</p>
+          </div>
 
-/>
-<h3 className="mt-4 text-xl font-semibold text-gray-900">Ankit Kumar</h3>
-      <p className="text-gray-600 text-sm">Ideation and Open CV</p>
-    </div>
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <img
+              src={ankit}
+              alt="Team Member"
+              className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover object-top"
 
-    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
-      <img src={setu} alt="Team Member"
-  className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover" />
+            />
+            <h3 className="mt-4 text-xl font-semibold text-gray-900">Ankit Kumar</h3>
+            <p className="text-gray-600 text-sm">Ideation and Open CV</p>
+          </div>
 
-      <h3 className="mt-4 text-xl font-semibold text-gray-900">Setu Arya</h3>
-      <p className="text-gray-600 text-sm">Frontend Designer</p>
-    </div>
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <img src={setu} alt="Team Member"
+              className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover" />
 
-  </div>
-</section>
+            <h3 className="mt-4 text-xl font-semibold text-gray-900">Setu Arya</h3>
+            <p className="text-gray-600 text-sm">Frontend Designer</p>
+          </div>
+
+        </div>
+      </section>
 
 
       {/* Footer */}
@@ -493,55 +498,94 @@ const HomePage = () => {
       </footer>
 
       {/* Floating Chat Icon */}
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end">
-  {chatOpen && (
-   <div className="mb-2 w-[550px] h-[520px] bg-white shadow-2xl rounded-xl overflow-hidden flex flex-col">
-  <div className="bg-indigo-700 text-white p-4 font-semibold flex justify-between items-center text-lg">
-    Chat with AI
-    <button
-      onClick={() => setChatOpen(false)}
-      className="ml-2 font-bold text-xl leading-none"
-    >
-      ✕
-    </button>
-  </div>
+      <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end">
+        {chatOpen && (
+          <div className="mb-2 w-[550px] h-[520px] bg-white shadow-2xl rounded-xl overflow-hidden flex flex-col">
+            <div className="bg-indigo-700 text-white p-4 font-semibold flex justify-between items-center text-lg">
+              Chat with AI
+              <button
+                onClick={() => setChatOpen(false)}
+                className="ml-2 font-bold text-xl leading-none"
+              >
+                ✕
+              </button>
+            </div>
 
-  <iframe
-    src="http://localhost:8501"
-    className="flex-1"
-    style={{ border: "none" }}
-    title="StudyBuddy"
-  />
-</div>
+            <iframe
+              src="http://localhost:8501"
+              className="flex-1"
+              style={{ border: "none" }}
+              title="StudyBuddy"
+            />
+          </div>
 
-  )}
-  {/* <button
+        )}
+        {/* <button
     onClick={handleChatClick} // ✨ MODIFIED: Use new handler
     className="w-16 h-16 rounded-full bg-indigo-700 shadow-xl flex items-center justify-center text-white text-2xl hover:bg-indigo-800 transition-colors"
   >
     💬
   </button> */}
 
-<div 
-  onClick={handleChatClick} 
-  className="cursor-pointer "
->
-  <Lottie
-    animationData={chatAnimation}
-    loop={true}
-    className="w-32 h-[130px]"
-  />
-</div>
+        <div
+          onClick={handleChatClick}
+          className="cursor-pointer "
+        >
+          <Lottie
+            animationData={chatAnimation}
+            loop={true}
+            className="w-32 h-[130px]"
+          />
+        </div>
 
 
 
-</div>
+      </div>
 
       {/* ✨ NEW: Render the modal component */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setAuthModalOpen(false)} 
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setAuthModalOpen(false)}
       />
+
+      {/* Dashboard Modal */}
+      {isDashboardModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-black/60 backdrop-blur-sm">
+          <div className="relative w-full h-full max-w-7xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-indigo-700 to-purple-800 p-4 md:p-6 text-white flex justify-between items-center">
+              <div>
+                <h2 className="text-xl md:text-2xl font-bold flex items-center gap-3">
+                  📊 Focus & Study Dashboard
+                </h2>
+                <p className="text-sm opacity-80 hidden md:block">Real-time analytics and smart reminder insights</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/reminders"
+                  className="hidden md:block bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition-all text-sm font-semibold"
+                  onClick={() => setDashboardModalOpen(false)}
+                >
+                  Go to Reminders Page
+                </Link>
+                <button
+                  onClick={() => setDashboardModalOpen(false)}
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-2xl transition-all"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Dashboard Iframe */}
+            <iframe
+              src="http://localhost:8501"
+              className="flex-1 w-full border-none"
+              title="Streamlit Dashboard"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Animation style */}
       <style>{`

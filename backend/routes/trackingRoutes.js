@@ -37,57 +37,32 @@ router.post("/videos-watched", protect, async (req, res) => {
     const user = req.user;
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Allow client to provide their local date (YYYY-MM-DD). If provided, use it
-    // so streak calculations reflect the user's local calendar day.
-    const clientDate = req.body?.lastDayWatched;
-    const today = clientDate && /^\d{4}-\d{2}-\d{2}$/.test(clientDate) ? clientDate : getLocalDateString();
-
-    // Use stored lastDayWatched if available (assumed stored as YYYY-MM-DD), else null
-    const lastWatchedDate = user.lastDayWatched ? String(user.lastDayWatched) : null;
+    const today = getLocalDateString();
+    const lastWatchedDate = user.lastDayWatched; // now a String (YYYY-MM-DD or null)
 
     // ✅ Increment total videos watched
     user.videosWatched = (user.videosWatched || 0) + 1;
 
-
-    // ✅ Streak logic using YYYY-MM-DD dates (robust against timezone differences)
-    const parseYMD = (s) => {
-      if (!s) return null;
-      const parts = s.split("-");
-      if (parts.length !== 3) return null;
-      const y = parseInt(parts[0], 10);
-      const m = parseInt(parts[1], 10) - 1;
-      const d = parseInt(parts[2], 10);
-      return Date.UTC(y, m, d);
-    };
-
     if (!lastWatchedDate) {
-      // first time
+      // First time studying
       user.streak = 1;
     } else if (lastWatchedDate === today) {
-      // same calendar day (in user's local date) — do nothing
+      // Already studied today - keep current streak
     } else {
-      const lastUTC = parseYMD(lastWatchedDate);
-      const todayUTC = parseYMD(today);
-      if (lastUTC == null || todayUTC == null) {
-        user.streak = 1; // fallback
+      // Check if it's exactly the next day
+      const lastDate = new Date(lastWatchedDate);
+      const todayDate = new Date(today);
+      const diffTime = Math.abs(todayDate - lastDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        user.streak = (user.streak || 0) + 1;
       } else {
-        const diffDays = Math.round((todayUTC - lastUTC) / (1000 * 60 * 60 * 24));
-        if (diffDays === 1) {
-          // watched next day → increment streak
-          user.streak = (user.streak || 0) + 1;
-        } else if (diffDays > 1) {
-          // missed one or more days → reset streak
-          user.streak = 1;
-        } else {
-          // negative or zero difference — treat as same day
-        }
+        user.streak = 1;
       }
     }
 
-    // ✅ Persist the user's last watched date as the user's local YYYY-MM-DD
     user.lastDayWatched = today;
-
-    // ✅ Save changes
     await user.save();
 
     res.json({
@@ -184,8 +159,8 @@ router.get("/coins/:id", async (req, res) => {
 
     res.json({
       success: true,
-      coins: user.coins,
-      streak: user.streak,
+      coins: user.coins || 0,
+      streak: user.streak || 0,
       videosWatched: user.videosWatched || 0,
       videosSwitched: user.videosSwitched || 0,
     });
@@ -243,12 +218,18 @@ router.post("/add-history", protect, async (req, res) => {
       return res.json({ success: false, message: "Session too short, not saved" });
     }
 
+    // ✅ Fetch any persistent note/tag for this video
+    const note = (user.notes && user.notes[videoId]) || "";
+    const tag = (user.tags && user.tags[videoId]) || "";
+
     const newEntry = {
       videoId,
       url,
       secondsWatched: Math.round(secondsWatched),
       tabSwitches: tabSwitches || 0,
       watchedAt: getLocalDateString(), // ✅ Use local date string (YYYY-MM-DD)
+      note,
+      tag,
     };
 
     // ✅ Keep full history in DB
@@ -386,23 +367,30 @@ router.post("/save-note-tag", protect, async (req, res) => {
     user.markModified("notes");
     user.markModified("tags");
 
-    // ✅ Update existing history entry (instead of adding new one)
-    const existing = user.history.find((h) => h.videoId === videoId);
-    if (existing) {
-      if (noteText !== undefined) existing.note = noteText;
-      if (tagText !== undefined) existing.tag = tagText;
-    } else {
+    // ✅ Update ALL existing history entries for this video for consistency
+    let entryFound = false;
+    user.history.forEach((h) => {
+      if (h.videoId === videoId) {
+        if (noteText !== undefined) h.note = noteText;
+        if (tagText !== undefined) h.tag = tagText;
+        entryFound = true;
+      }
+    });
+
+    if (!entryFound) {
       // If no entry found (edge case), add one cleanly
       user.history.unshift({
         videoId,
         url: `https://youtu.be/${videoId}`,
         secondsWatched: 0,
         tabSwitches: 0,
-        watchedAt: new Date(),
+        watchedAt: getLocalDateString(),
         note: noteText || "",
         tag: tagText || "",
       });
     }
+
+    user.markModified("history");
 
     await user.save();
 
