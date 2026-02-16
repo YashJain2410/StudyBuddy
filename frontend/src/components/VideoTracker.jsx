@@ -97,7 +97,10 @@ async function isStudyVideo(videoId) {
     );
     const data = await res.json();
 
-    if (!data.title) return false;
+    if (!data.title) {
+      console.log("⚠️ Title missing → allowing");
+      return true;
+    }
 
     const title = data.title.toLowerCase();
 
@@ -106,9 +109,10 @@ async function isStudyVideo(videoId) {
     );
   } catch (e) {
     console.error("Video title check failed:", e);
-    return false;
+    return true;
   }
 }
+
 
 
 
@@ -1880,6 +1884,12 @@ export default function VideoTracker() {
               />
               {localVideoFile && <span style={{ fontSize: "14px", color: "#4b5563" }}>Selected: {localVideoFile.name}</span>}
             </div>
+            <button
+              onClick={clearHistory}
+              style={{ ...styles.button, ...styles.secondaryButton }}
+            >
+              Clear All
+            </button>
 
             {/* 🎯 Focus Session Button
       <button
