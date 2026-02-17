@@ -631,17 +631,22 @@ export default function VideoTracker() {
     }
   }, [userId]);
 
-  // Build monthData (minutes per day) from appState.history whenever history / month / year change
+  // ✅ Build monthData (minutes per day) from appState.history whenever history / month / year change
+  // IMPORTANT: This uses the FULL history array (ALL sessions from database), NOT just the last 5.
+  // The history cards below are sliced to show only 5, but the graph must show ALL data.
   useEffect(() => {
     const buildMonthData = () => {
       const year = Number(selectedYear);
       const month = Number(selectedMonth);
       const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // ✅ Use FULL history array - no slicing here!
       const historyArr = (appState.history && appState.history.length > 0)
         ? appState.history
         : JSON.parse(localStorage.getItem(`userHistory_${userId}`)) || [];
 
 
+      // ✅ Aggregate ALL sessions by date (sum of all sessions per day)
       const dailySecs = {};
       historyArr.forEach(item => {
         const dateKey = item.watchedAt ? (item.watchedAt.split("T")[0] || item.watchedAt) : "";
@@ -2342,6 +2347,8 @@ export default function VideoTracker() {
         </div>
 
         {/* 🎬 History Section - Compact Dashboard Widgets */}
+        {/* ✅ IMPORTANT: This section shows ONLY the last 5 sessions (sliced). */}
+        {/* The graph above uses ALL sessions from the database (unsliced). */}
         <div style={styles.panel}>
           <h3 style={styles.sectionTitle}>🎬 Last 5 Study Sessions</h3>
 
@@ -2349,6 +2356,7 @@ export default function VideoTracker() {
             <p style={{ color: "#9ca3af", fontSize: "0.9rem" }}>No recent study sessions found.</p>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "10px" }}>
+              {/* ✅ Only show last 5 sessions in cards - graph above uses ALL sessions */}
               {(appState.history || []).slice(0, 5).map((h, i) => {
                 const seconds = h.seconds || h.secondsWatched || 0;
                 const minutes = Math.floor(seconds / 60);

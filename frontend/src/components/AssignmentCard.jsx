@@ -607,37 +607,40 @@ const AssignmentCard = () => {
   const filteredHackathons = hackathons.filter(h => filter === "All" || h.status === filter);
 
   return (
-    <div className={darkMode ? 'dark-mode' : ''}>
-      {/* Navbar */}
-      <nav className="app-navbar">
-        <Link to="/" className="navbar-logo">
+    <div className={`min-h-screen ${darkMode ? 'dark-mode' : ''}`} style={{ background: 'linear-gradient(135deg, #e6e0f0, #f0f3f8)' }}>
+      {/* Navbar - Matching HomePage */}
+      <nav className="bg-white/30 backdrop-blur-lg shadow-lg py-4 px-8 flex justify-between items-center sticky top-0 z-50 rounded-b-2xl">
+        <Link
+          to="/"
+          className="text-2xl font-extrabold bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-clip-text text-transparent tracking-tight"
+        >
           StudyBuddy
         </Link>
 
-        <div className="navbar-links">
-          <Link to="/" className="navbar-link">Home</Link>
-          <Link to="/dashboard" className="navbar-link">Dashboard</Link>
-          <Link to="/blogs" className="navbar-link">Blogs</Link>
-          <Link to="/contact" className="navbar-link">Contact Us</Link>
+        <div className="hidden md:flex gap-8 font-medium">
+          <Link to="/dashboard" className="hover:text-pink-500 transition-colors duration-300">Dashboard</Link>
+          <Link to="/videos" className="hover:text-pink-500 transition-colors duration-300">Video Tracker</Link>
+          <Link to="/analytics" className="hover:text-pink-500 transition-colors duration-300">Analytics</Link>
+          <Link to="/assignments" className="hover:text-pink-500 transition-colors duration-300">Assignments</Link>
         </div>
 
         {/* Conditional Navbar with Logout Dropdown */}
         {user ? (
-          <div className="navbar-profile">
-            <button onClick={() => setDropdownOpen(!isDropdownOpen)} className="navbar-profile-btn">
+          <div className="relative">
+            <button onClick={() => setDropdownOpen(!isDropdownOpen)} className="flex items-center gap-3 cursor-pointer">
               <img
                 src={user.profileImage || profileIcon}
                 alt="Profile"
-                className="navbar-profile-img"
+                className="w-10 h-10 rounded-full border-2 border-indigo-700"
               />
-              <span className="navbar-profile-name">{user.name}</span>
+              <span className="font-semibold text-gray-900">{user.name}</span>
             </button>
 
             {isDropdownOpen && (
-              <div className="navbar-dropdown">
+              <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-50">
                 <button
                   onClick={handleLogout}
-                  className="navbar-dropdown-item"
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100"
                 >
                   Logout
                 </button>
@@ -645,154 +648,163 @@ const AssignmentCard = () => {
             )}
           </div>
         ) : (
-          <div className="navbar-auth">
-            <Link to="/login" className="navbar-auth-login">
+          <div className="flex gap-3">
+            <Link
+              to="/login"
+              className="px-4 py-2 border border-indigo-700 text-indigo-700 rounded-lg hover:bg-indigo-50 transition-all duration-300"
+            >
               Login
             </Link>
-            <Link to="/register" className="navbar-auth-signup">
+            <Link
+              to="/register"
+              className="px-4 py-2 bg-gradient-to-r from-indigo-700 to-pink-600 text-white rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
+            >
               Sign Up
             </Link>
           </div>
         )}
       </nav>
 
-      <div className="header">
-        <h1>📚 Assignment & Hackathon Tracker</h1>
-        <button id="darkModeToggle" className="dark-mode-toggle" onClick={() => setDarkMode(!darkMode)}>
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
-      </div>
+      {/* Main Content Wrapper */}
+      <div className="px-6 md:px-10 py-10">
 
-      {/* <div className="status-section">
+        <div className="header">
+          <h1>📚 Assignment & Hackathon Tracker</h1>
+          <button id="darkModeToggle" className="dark-mode-toggle" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
+        </div>
+
+        {/* <div className="status-section">
         <span className="coins">🪙 {coins} Coins</span>
         <span className="switches">🔄 {tabSwitches}/5 Free</span>
       </div> */}
 
-      <div className="filter-section">
-        <button className={filter === 'All' ? 'active-filter' : 'inactive-filter'} onClick={() => setFilter('All')}>All</button>
-        <button className={filter === 'Pending' ? 'active-filter' : 'inactive-filter'} onClick={() => setFilter('Pending')}>Pending</button>
-        <button className={filter === 'Completed' ? 'active-filter' : 'inactive-filter'} onClick={() => setFilter('Completed')}>Completed</button>
-      </div>
+        <div className="filter-section">
+          <button className={filter === 'All' ? 'active-filter' : 'inactive-filter'} onClick={() => setFilter('All')}>All</button>
+          <button className={filter === 'Pending' ? 'active-filter' : 'inactive-filter'} onClick={() => setFilter('Pending')}>Pending</button>
+          <button className={filter === 'Completed' ? 'active-filter' : 'inactive-filter'} onClick={() => setFilter('Completed')}>Completed</button>
+        </div>
 
-      <div className="cards-grid">
-        <div className="add-card">
-          <h2>📝 Add Assignment</h2>
-          <input type="text" placeholder="Assignment Title" value={newAssignment.title} onChange={(e) => setNewAssignment({ ...newAssignment, title: e.target.value })} />
-          <input type="datetime-local" value={newAssignment.deadline} onChange={(e) => setNewAssignment({ ...newAssignment, deadline: e.target.value })} />
-          <button onClick={handleAddAssignment}>Add Assignment</button>
+        <div className="cards-grid">
+          <div className="add-card">
+            <h2>📝 Add Assignment</h2>
+            <input type="text" placeholder="Assignment Title" value={newAssignment.title} onChange={(e) => setNewAssignment({ ...newAssignment, title: e.target.value })} />
+            <input type="datetime-local" value={newAssignment.deadline} onChange={(e) => setNewAssignment({ ...newAssignment, deadline: e.target.value })} />
+            <button onClick={handleAddAssignment}>Add Assignment</button>
+          </div>
+
+          <div className="add-card">
+            <h2>🏆 Add Hackathon</h2>
+            <input type="text" placeholder="Hackathon Title" value={newHackathon.title} onChange={(e) => setNewHackathon({ ...newHackathon, title: e.target.value })} />
+            <input type="date" value={newHackathon.date} onChange={(e) => setNewHackathon({ ...newHackathon, date: e.target.value })} />
+            <input type="text" placeholder="Platform" value={newHackathon.platform} onChange={(e) => setNewHackathon({ ...newHackathon, platform: e.target.value })} />
+            <input type="text" placeholder="Link" value={newHackathon.link} onChange={(e) => setNewHackathon({ ...newHackathon, link: e.target.value })} />
+            <button onClick={handleAddHackathon}>Add Hackathon</button>
+          </div>
+
+          <div className="add-card">
+            <h2>⏰ Add Reminder</h2>
+            <input type="text" placeholder="Reminder Title" value={newReminder.title} onChange={(e) => setNewReminder({ ...newReminder, title: e.target.value })} />
+            <input type="time" value={newReminder.time} onChange={(e) => setNewReminder({ ...newReminder, time: e.target.value })} />
+            <button onClick={handleAddReminder}>Add Reminder</button>
+          </div>
         </div>
 
         <div className="add-card">
-          <h2>🏆 Add Hackathon</h2>
-          <input type="text" placeholder="Hackathon Title" value={newHackathon.title} onChange={(e) => setNewHackathon({ ...newHackathon, title: e.target.value })} />
-          <input type="date" value={newHackathon.date} onChange={(e) => setNewHackathon({ ...newHackathon, date: e.target.value })} />
-          <input type="text" placeholder="Platform" value={newHackathon.platform} onChange={(e) => setNewHackathon({ ...newHackathon, platform: e.target.value })} />
-          <input type="text" placeholder="Link" value={newHackathon.link} onChange={(e) => setNewHackathon({ ...newHackathon, link: e.target.value })} />
-          <button onClick={handleAddHackathon}>Add Hackathon</button>
+          <h2>📊 Weekly Stats</h2>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={graphData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="Completed" stroke="#4ade80" strokeWidth={2} name="Completed" activeDot={{ r: 6 }} />
+              <Line type="monotone" dataKey="Pending" stroke="#facc15" strokeWidth={2} name="Pending" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
-        <div className="add-card">
-          <h2>⏰ Add Reminder</h2>
-          <input type="text" placeholder="Reminder Title" value={newReminder.title} onChange={(e) => setNewReminder({ ...newReminder, title: e.target.value })} />
-          <input type="time" value={newReminder.time} onChange={(e) => setNewReminder({ ...newReminder, time: e.target.value })} />
-          <button onClick={handleAddReminder}>Add Reminder</button>
+        <div style={{ marginBottom: '2rem' }}>
+          <h2>📝 Assignments</h2>
+          <div className="item-grid">
+            {filteredAssignments.map((a, index) => {
+              const assignmentDate = a.deadline || a.dueDate;
+              const remaining = getTimeRemaining(assignmentDate);
+              const urgency = getUrgency(assignmentDate);
+              const cloudClass = a.status === "Completed" ? 'completed' : `pending-${urgency}`;
+              return (
+                <div key={a._id || `a-${index}`} className={`cloud-item assignment-item ${cloudClass}`}>
+                  <p className="item-title">{a.title}</p>
+                  <p className="item-details">{formatDate(assignmentDate)}</p>
+                  <button className="status-btn" onClick={() => toggleStatus(a._id, 'assignment')}>
+                    {a.status === "Pending" ? "Mark Complete" : "Mark Pending"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      <div className="add-card">
-        <h2>📊 Weekly Stats</h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={graphData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="Completed" stroke="#4ade80" strokeWidth={2} name="Completed" activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="Pending" stroke="#facc15" strokeWidth={2} name="Pending" />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+        <div style={{ marginBottom: '2rem' }}>
+          <h2>🏆 Hackathons</h2>
+          <div className="item-grid">
+            {filteredHackathons.map((h, index) => {
+              const cloudClass = h.status === "Completed" ? 'completed' : 'pending-normal';
+              return (
+                <div key={h._id || `h-${index}`} className={`cloud-item hackathon-item ${cloudClass}`}>
+                  <p className="item-title">{h.title}</p>
+                  <p className="item-details">{formatDate(h.date)}</p>
+                  <p className="item-details">{h.platform}</p>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h2>📝 Assignments</h2>
-        <div className="item-grid">
-          {filteredAssignments.map((a, index) => {
-            const assignmentDate = a.deadline || a.dueDate;
-            const remaining = getTimeRemaining(assignmentDate);
-            const urgency = getUrgency(assignmentDate);
-            const cloudClass = a.status === "Completed" ? 'completed' : `pending-${urgency}`;
-            return (
-              <div key={a._id || `a-${index}`} className={`cloud-item assignment-item ${cloudClass}`}>
-                <p className="item-title">{a.title}</p>
-                <p className="item-details">{formatDate(assignmentDate)}</p>
-                <button className="status-btn" onClick={() => toggleStatus(a._id, 'assignment')}>
-                  {a.status === "Pending" ? "Mark Complete" : "Mark Pending"}
-                </button>
-              </div>
-            );
-          })}
+                  {/* ✅ CLICKABLE LINK ADDED HERE */}
+                  {h.link && (
+                    <a
+                      href={h.link.startsWith("http") ? h.link : `https://${h.link}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hackathon-link"
+                    >
+                      🔗 Visit Hackathon Page
+                    </a>
+                  )}
+
+                  <button className="status-btn" onClick={() => toggleStatus(h._id, 'hackathon')}>
+                    {h.status === "Pending" ? "Mark Complete" : "Mark Pending"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h2>🏆 Hackathons</h2>
-        <div className="item-grid">
-          {filteredHackathons.map((h, index) => {
-            const cloudClass = h.status === "Completed" ? 'completed' : 'pending-normal';
-            return (
-              <div key={h._id || `h-${index}`} className={`cloud-item hackathon-item ${cloudClass}`}>
-                <p className="item-title">{h.title}</p>
-                <p className="item-details">{formatDate(h.date)}</p>
-                <p className="item-details">{h.platform}</p>
+        <div style={{ marginBottom: '2rem' }}>
+          <h2>⏰ Reminders</h2>
+          <div className="item-grid">
+            {reminders.map((r, index) => {
+              const now = new Date();
+              const [hours, minutes] = r.time ? r.time.split(":").map(Number) : [0, 0];
+              const target = new Date(now);
+              target.setHours(hours, minutes, 0, 0);
+              const diff = target - now;
+              const timeLeft = diff > 0 ? `${Math.floor(diff / 1000 / 60 / 60)}h ${Math.floor((diff / 1000 / 60) % 60)}m left` : "Time Passed";
 
-                {/* ✅ CLICKABLE LINK ADDED HERE */}
-                {h.link && (
-                  <a
-                    href={h.link.startsWith("http") ? h.link : `https://${h.link}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hackathon-link"
-                  >
-                    🔗 Visit Hackathon Page
-                  </a>
-                )}
+              const isHighlighted = highlightedReminders.has(r._id);
 
-                <button className="status-btn" onClick={() => toggleStatus(h._id, 'hackathon')}>
-                  {h.status === "Pending" ? "Mark Complete" : "Mark Pending"}
-                </button>
-              </div>
-            );
-          })}
+              return (
+                <div key={r._id || `r-${index}`} className={`cloud-item reminder-item ${isHighlighted ? 'reminder-glow' : ''}`}>
+                  <p className="item-title">{r.title}</p>
+                  <p className="item-details">{r.time}</p>
+                  <p className="item-details">{timeLeft}</p>
+                  <button className="status-btn" onClick={() => removeReminder(r._id)}>Dismiss</button>
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h2>⏰ Reminders</h2>
-        <div className="item-grid">
-          {reminders.map((r, index) => {
-            const now = new Date();
-            const [hours, minutes] = r.time ? r.time.split(":").map(Number) : [0, 0];
-            const target = new Date(now);
-            target.setHours(hours, minutes, 0, 0);
-            const diff = target - now;
-            const timeLeft = diff > 0 ? `${Math.floor(diff / 1000 / 60 / 60)}h ${Math.floor((diff / 1000 / 60) % 60)}m left` : "Time Passed";
-
-            const isHighlighted = highlightedReminders.has(r._id);
-
-            return (
-              <div key={r._id || `r-${index}`} className={`cloud-item reminder-item ${isHighlighted ? 'reminder-glow' : ''}`}>
-                <p className="item-title">{r.title}</p>
-                <p className="item-details">{r.time}</p>
-                <p className="item-details">{timeLeft}</p>
-                <button className="status-btn" onClick={() => removeReminder(r._id)}>Dismiss</button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <style>{`
+        <style>{`
         /* All original CSS + new hackathon-link style */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         :root {
@@ -802,26 +814,7 @@ const AssignmentCard = () => {
             --cloud-bg-assignment: #f7e6f8; --cloud-bg-hackathon: #e6f8f7; --cloud-bg-reminder: #f8e6f7;
             --cloud-bg-completed: #dceefc; --cloud-bg-urgent: #fbc2c2; --cloud-bg-warning: #ffe6cc;
         }
-        /* Navbar Styles - Match HomePage */
-        .app-navbar { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(12px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem; }
-        .navbar-logo { font-size: 1.5rem; font-weight: 900; background: linear-gradient(to right, #4338ca, #7c3aed, #db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; font-family: 'Poppins', sans-serif; }
-        .navbar-links { display: none; gap: 2rem; font-weight: 500; }
-        @media (min-width: 768px) { .navbar-links { display: flex; } }
-        .navbar-link { text-decoration: none; color: #1f2937; transition: color 0.3s ease; }
-        .navbar-link:hover { color: #ec4899; }
-        .navbar-profile { position: relative; }
-        .navbar-profile-btn { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; background: none; border: none; padding: 0; }
-        .navbar-profile-img { width: 2.5rem; height: 2.5rem; border-radius: 50%; border: 2px solid #4338ca; }
-        .navbar-profile-name { font-weight: 600; color: #1f2937; }
-        .navbar-dropdown { position: absolute; right: 0; margin-top: 0.5rem; padding: 0.5rem; width: 12rem; background: white; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); z-index: 50; }
-        .navbar-dropdown-item { width: 100%; text-align: left; padding: 0.5rem 1rem; font-size: 0.875rem; color: #374151; background: none; border: none; cursor: pointer; transition: background-color 0.2s; }
-        .navbar-dropdown-item:hover { background-color: #e0e7ff; }
-        .navbar-auth { display: flex; gap: 0.75rem; }
-        .navbar-auth-login { padding: 0.5rem 1rem; border: 1px solid #4338ca; color: #4338ca; border-radius: 0.5rem; text-decoration: none; transition: background-color 0.3s; font-family: 'Poppins', sans-serif; }
-        .navbar-auth-login:hover { background-color: #f5f3ff; }
-        .navbar-auth-signup { padding: 0.5rem 1rem; background: linear-gradient(to right, #4338ca, #db2777); color: white; border-radius: 0.5rem; text-decoration: none; box-shadow: 0 20px 25px -5px rgba(59, 56, 202, 0.3); transition: box-shadow 0.3s, transform 0.3s; font-family: 'Poppins', sans-serif; }
-        .navbar-auth-signup:hover { box-shadow: 0 25px 35px -5px rgba(59, 56, 202, 0.4); transform: scale(1.05); }
-        body { padding: 2rem; margin: 0; }
+        body { padding: 0; margin: 0; }
         .app-container { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, var(--bg-start-color), var(--bg-end-color)); color: var(--text-color); min-height: 100vh; }
         .dark-mode { background: #1f2937; color: #e5e7eb; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
@@ -876,6 +869,7 @@ const AssignmentCard = () => {
             50% { transform: translateY(-10px) scale(1.08); box-shadow: 0 0 40px #db2777, inset 0 0 25px #db2777 !important; }
         }
       `}</style>
+      </div>
     </div>
   );
 };
