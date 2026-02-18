@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import profileIcon from '../assets/profile_icon.png';
 import AssignmentCard from "../components/AssignmentCard";
 import VideoTracker from "../components/VideoTracker";
-import AuthModal from "../components/AuthModal"; 
+import AuthModal from "../components/AuthModal";
 import Leaderboard from "../components/Leaderboard";
 import Lottie from "lottie-react";
 import chatAnimation from "../assets/chatAnimation.json";
@@ -561,13 +561,13 @@ const HomePage = () => {
                 <p className="text-sm opacity-80 hidden md:block">Real-time analytics and smart reminder insights</p>
               </div>
               <div className="flex items-center gap-4">
-                <Link
+                {/* <Link
                   to="/reminders"
                   className="hidden md:block bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition-all text-sm font-semibold"
                   onClick={() => setDashboardModalOpen(false)}
                 >
                   Go to Reminders Page
-                </Link>
+                </Link> */}
                 <button
                   onClick={() => setDashboardModalOpen(false)}
                   className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-2xl transition-all"
@@ -579,7 +579,7 @@ const HomePage = () => {
 
             {/* Dashboard Iframe */}
             <iframe
-              src="http://localhost:8501"
+              src="http://localhost:8502"
               className="flex-1 w-full border-none"
               title="Streamlit Dashboard"
             />
