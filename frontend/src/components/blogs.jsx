@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppContext } from "../context/AppContext";
+import profileIcon from '../assets/profile_icon.png';
 
 const initialBlogPosts = [
     {
@@ -81,21 +83,104 @@ const Blog = () => {
     const [posts, setPosts] = useState(initialBlogPosts);
     const [isPremiumModalVisible, setPremiumModalVisible] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
+    const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const { appState } = useAppContext();
+    const { user } = appState;
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            const data = await res.json();
+
+            // Remove user from storage & state regardless of API response
+            localStorage.removeItem("user");
+            setDropdownOpen(false);
+
+            if (res.ok) {
+                navigate("/");
+            } else {
+                console.error("Logout failed:", data.message);
+            }
+        } catch (error) {
+            console.error("Error during logout:", error);
+            // Ensure frontend logout even if server call fails
+            localStorage.removeItem("user");
+            setDropdownOpen(false);
+            alert("An error occurred during logout.");
+        }
+    };
 
     return (
         <div className="blog-page-container">
-            <header className="navbar">
-                <Link to="/" className="logo">StudyBuddy</Link>
-                <nav className="nav-links">
-                    <Link to="/dashboard">Dashboard</Link>
-                    <Link to="/">About Us</Link>
-                    <Link to="/contact">Contact Us</Link>
-                </nav>
-                <div className="auth-buttons">
-                    <Link to="/login"><button className="login-btn">Login</button></Link>
-                    <Link to="/register"><button className="signup-btn">Sign Up</button></Link>
+            {/* Navbar */}
+            <nav className="bg-white/30 backdrop-blur-lg shadow-lg py-4 px-8 flex justify-between items-center sticky top-0 z-50 rounded-b-2xl">
+                <Link
+                    to="/"
+                    className="text-2xl font-extrabold bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-600 bg-clip-text text-transparent tracking-tight"
+                >
+                    StudyBuddy
+                </Link>
+
+                <div className="hidden md:flex gap-8 font-medium">
+                    <Link
+                        to="/dashboard"
+                        className="hover:text-pink-500 transition-colors duration-300"
+                    >
+                        Dashboard
+                    </Link>
+                    <Link to="/videos" className="hover:text-pink-500 transition-colors duration-300">Video Tracker</Link>
+                    <Link to="/analytics" className="hover:text-pink-500 transition-colors duration-300">Analytics</Link>
+                    <Link to="/assignments" className="hover:text-pink-500 transition-colors duration-300">Assignments</Link>
                 </div>
-            </header>
+
+                {/* Conditional Navbar with Logout Dropdown */}
+                {user ? (
+                    <div className="relative">
+                        {/* Clickable profile icon to toggle dropdown */}
+                        <button onClick={() => setDropdownOpen(!isDropdownOpen)} className="flex items-center gap-3 cursor-pointer">
+                            <img
+                                src={user.profileImage || profileIcon}
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full border-2 border-indigo-700"
+                            />
+                            <span className="font-semibold text-gray-900">{user.name}</span>
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {isDropdownOpen && (
+                            <div className="absolute right-0 mt-2 py-2 w-48 bg-white rounded-lg shadow-xl z-50">
+                                <button
+                                    onClick={handleLogout}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex gap-3">
+                        <Link
+                            to="/login"
+                            className="px-4 py-2 border border-indigo-700 text-indigo-700 rounded-lg hover:bg-indigo-50 transition-all duration-300"
+                        >
+                            Login
+                        </Link>
+                        <Link
+                            to="/register"
+                            className="px-4 py-2 bg-gradient-to-r from-indigo-700 to-pink-600 text-white rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
+                        >
+                            Sign Up
+                        </Link>
+                    </div>
+                )}
+            </nav>
 
             <main className="container">
                 <div className="add-blog-section">
@@ -159,43 +244,6 @@ const Blog = () => {
                     --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                     --heading-color: #6B57E0;
                     --card-bg: #fff;
-                }
-                .navbar {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 1.5rem 5%;
-                    background: var(--btn-gradient);
-                    color: white;
-                    box-shadow: var(--box-shadow);
-                }
-                .navbar .logo, .navbar a {
-                    color: white;
-                    text-decoration: none;
-                }
-                .navbar .logo {
-                    font-size: 1.8rem;
-                    font-weight: 700;
-                }
-                .navbar .nav-links a {
-                    margin-left: 2rem;
-                    font-weight: 500;
-                }
-                .navbar .auth-buttons button {
-                    padding: 0.6rem 1.5rem;
-                    border: none;
-                    border-radius: 25px;
-                    font-weight: 600;
-                    cursor: pointer;
-                }
-                .navbar .login-btn {
-                    background-color: transparent;
-                    border: 2px solid white;
-                    margin-right: 1rem;
-                }
-                .navbar .signup-btn {
-                    background-color: white;
-                    color: var(--heading-color);
                 }
                 .container {
                     max-width: 1200px;
@@ -390,21 +438,6 @@ const Blog = () => {
                 }
                 .full-blog-content-text {
                     line-height: 1.8;
-                }
-                 @media (max-width: 768px) {
-                    .navbar {
-                        flex-direction: column;
-                        align-items: flex-start;
-                        padding: 1.5rem;
-                    }
-
-                    .navbar .nav-links {
-                        display: none;
-                    }
-
-                    .navbar .auth-buttons {
-                        margin-top: 1rem;
-                    }
                 }
             `}</style>
         </div>
