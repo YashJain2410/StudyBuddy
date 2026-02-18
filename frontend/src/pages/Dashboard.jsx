@@ -89,9 +89,8 @@ const Dashboard = () => {
       </p>
     );
 
-  // ---------------------------------------------------------
   // 🔥 FINAL FIX (Backend + Local History Merge — Correct Way)
-  // ---------------------------------------------------------
+ 
   const finalActivity = { ...monthlyActivity };
 
   // Add watched time from history
@@ -104,7 +103,7 @@ const Dashboard = () => {
 
     finalActivity[dayKey].totalSeconds += h.secondsWatched || 0;
   });
-  // ---------------------------------------------------------
+ 
 
   // Full Month Days
   const now = new Date();

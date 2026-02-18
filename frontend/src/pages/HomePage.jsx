@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; // useNavigate is needed for logout
+import { Link, useNavigate } from "react-router-dom"; 
 import profileIcon from '../assets/profile_icon.png';
 import AssignmentCard from "../components/AssignmentCard";
 import VideoTracker from "../components/VideoTracker";
-import AuthModal from "../components/AuthModal"; // ✨ NEW: Import the modal
+import AuthModal from "../components/AuthModal"; 
 import Leaderboard from "../components/Leaderboard";
 import Lottie from "lottie-react";
 import chatAnimation from "../assets/chatAnimation.json";
