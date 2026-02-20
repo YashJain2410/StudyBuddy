@@ -11,6 +11,7 @@ import ankit from "../assets/ankit1.jpeg"
 import anshika from "../assets/anshika1.jpeg"
 import ananya from "../assets/ananya1.jpeg"
 import setu from "../assets/setu1.jpeg"
+import yash from "../assets/yash.jpeg"
 
 
 // ------------------- Chatbot Component -------------------
@@ -416,7 +417,7 @@ const HomePage = () => {
           to achieve their goals without distractions.
         </p>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-7xl mx-auto px-6">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 max-w-7xl mx-auto px-6">
 
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
             <img
@@ -455,6 +456,15 @@ const HomePage = () => {
             <p className="text-gray-600 text-sm">Frontend Designer</p>
           </div>
 
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition">
+            <img
+              src={yash} alt="Team Member"
+              className="w-48 h-48 mx-auto rounded-full border-4 border-indigo-600 shadow-md object-cover"
+            />
+            <h3 className="mt-4 text-xl font-semibold text-gray-900">Yash Jain</h3>
+            <p className="text-gray-600 text-sm">AI/ML</p>
+          </div>
+
         </div>
       </section>
 
@@ -479,7 +489,7 @@ const HomePage = () => {
             <h4 className="font-semibold mb-3 text-white">Company</h4>
             <ul className="space-y-2 text-sm">
               <li><Link to="/about" className="hover:text-white">About Us</Link></li>
-              <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+              {/* <li><Link to="/contact" className="hover:text-white">Contact</Link></li> */}
               <li><Link to="/careers" className="hover:text-white">Careers</Link></li>
             </ul>
           </div>
