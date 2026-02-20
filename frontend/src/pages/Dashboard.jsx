@@ -14,6 +14,9 @@ import {
 } from "recharts";
 import { eachDayOfInterval, format, startOfMonth, endOfMonth } from "date-fns";
 
+import { apiFetch } from "../utils/api";
+const API = import.meta.env.VITE_API_URL;
+
 const Dashboard = () => {
   const { appState } = useAppContext();
   const { user, coins, streak, history, videosWatched, videosSwitched } =
@@ -30,7 +33,7 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const res = await apiFetch("/api/tracking/monthly-activity", {
+      const res = await apiFetch(`${API}/api/tracking/monthly-activity`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -54,7 +57,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await apiFetch("/api/auth/logout", {
+      const res = await apiFetch(`${API}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

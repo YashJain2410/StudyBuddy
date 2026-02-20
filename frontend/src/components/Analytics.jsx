@@ -133,7 +133,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await apiFetch("/api/reports/my"); // 🔥 simple call
+        const res = await apiFetch(`${API}/api/reports/my"); // 🔥 simple call
 
         const data = await res.json();
 

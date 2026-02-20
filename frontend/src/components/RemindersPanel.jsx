@@ -5,17 +5,20 @@ import { apiFetch } from "../utils/api";
 const RemindersPanel = () => {
   const {
     reminders, addReminder, removeReminder,
-    highlightedReminders, clearToast
+    highlightedReminders
   } = useAppContext();
 
   const [newReminderTitle, setNewReminderTitle] = useState("");
   const [reminderTime, setReminderTime] = useState("");
 
+  const API = import.meta.env.VITE_API_URL;
+
+
   const handleAdd = async () => {
     if (newReminderTitle.trim() && reminderTime) {
       const token = localStorage.getItem("token");
       try {
-        const res = await apiFetch("/api/reminders/add", {
+        const res = await apiFetch(`${API}/api/reminders/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

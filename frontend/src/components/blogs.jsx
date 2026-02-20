@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppContext } from "../context/AppContext";
 import profileIcon from '../assets/profile_icon.png';
@@ -81,7 +81,7 @@ const initialBlogPosts = [
 
 // The component name MUST be capitalized (PascalCase)
 const Blog = () => {
-    const [posts, setPosts] = useState(initialBlogPosts);
+    const [posts] = useState(initialBlogPosts);
     const [isPremiumModalVisible, setPremiumModalVisible] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -89,9 +89,11 @@ const Blog = () => {
     const { user } = appState;
     const navigate = useNavigate();
 
+    const API = import.meta.env.VITE_API_URL;
+
     const handleLogout = async () => {
         try {
-            const res = await apiFetch("/api/auth/logout", {
+            const res = await apiFetch(`${API}/api/auth/logout`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

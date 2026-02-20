@@ -113,9 +113,9 @@ export const AppProvider = ({ children }) => {
 
       try {
         const [aRes, hRes, rRes] = await Promise.all([
-          apiFetch("/api/assignments/list", { headers: { Authorization: `Bearer ${token}` } }),
-          apiFetch("/api/hackathons/list", { headers: { Authorization: `Bearer ${token}` } }),
-          apiFetch("/api/reminders/list", { headers: { Authorization: `Bearer ${token}` } }),
+          apiFetch(`${API}/api/assignments/list`, { headers: { Authorization: `Bearer ${token}` } }),
+          apiFetch(`${API}/api/hackathons/list`, { headers: { Authorization: `Bearer ${token}` } }),
+          apiFetch(`${API}/api/reminders/list`, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         const [aData, hData, rData] = await Promise.all([aRes.json(), hRes.json(), rRes.json()]);
@@ -241,7 +241,7 @@ export const AppProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        const res = await apiFetch("/api/tracking/history", {
+        const res = await apiFetch(`${API}/api/tracking/history", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch history");
@@ -267,7 +267,7 @@ export const AppProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        const res = await apiFetch("/api/tracking/notes-tags", {
+        const res = await apiFetch(`${API}/api/tracking/notes-tags", {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         });

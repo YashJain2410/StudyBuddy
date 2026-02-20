@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext"; // ✅ import context
 
+const API = import.meta.env.VITE_API_URL;
+import { apiFetch } from "../utils/api";
+
+
 const Register = () => {
   const navigate = useNavigate();
   const { setAppState } = useAppContext(); // ✅ context updater
@@ -31,7 +35,7 @@ const Register = () => {
   const handleSignup = async (e) => {
   e.preventDefault();
   try {
-    const res = await apiFetch("/api/auth/signup", {
+    const res = await apiFetch(`${API}/api/auth/signup`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

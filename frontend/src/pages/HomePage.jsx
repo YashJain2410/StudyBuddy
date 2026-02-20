@@ -14,6 +14,10 @@ import setu from "../assets/setu1.jpeg"
 import yash from "../assets/yash.jpeg"
 
 
+const API = import.meta.env.VITE_API_URL;
+import { apiFetch } from "../utils/api";
+
+
 // ------------------- Chatbot Component -------------------
 const Chatbot = () => {
   const [messages, setMessages] = useState([
@@ -121,7 +125,7 @@ const HomePage = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await apiFetch("/api/auth/logout", {
+      const res = await apiFetch(`${API}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
