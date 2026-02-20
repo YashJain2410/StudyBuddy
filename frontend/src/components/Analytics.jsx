@@ -126,6 +126,8 @@
 import React, { useEffect, useState } from "react";
 import { apiFetch } from "../utils/api";
 
+const API = import.meta.env.VITE_API_URL;
+
 const Analytics = () => {
   const [pdfReports, setPdfReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,7 +135,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await apiFetch(`${API}/api/reports/my"); // 🔥 simple call
+        const res = await apiFetch(`${API}/api/reports/my`); // 🔥 simple call
 
         const data = await res.json();
 

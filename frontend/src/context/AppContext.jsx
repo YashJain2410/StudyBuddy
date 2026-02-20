@@ -3,6 +3,9 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 export const AppContext = createContext();
 
+const API = import.meta.env.VITE_API_URL;
+import { apiFetch } from "../utils/api";
+
 export const AppProvider = ({ children }) => {
   const [appState, setAppState] = useState({
     user: JSON.parse(localStorage.getItem("user")) || null,
@@ -241,7 +244,7 @@ export const AppProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        const res = await apiFetch(`${API}/api/tracking/history", {
+        const res = await apiFetch(`${API}/api/tracking/history`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch history");
@@ -267,7 +270,7 @@ export const AppProvider = ({ children }) => {
       if (!token) return;
 
       try {
-        const res = await apiFetch(`${API}/api/tracking/notes-tags", {
+        const res = await apiFetch(`${API}/api/tracking/notes-tags`, {
           headers: { Authorization: `Bearer ${token}` },
           credentials: "include",
         });
