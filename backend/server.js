@@ -4,74 +4,75 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import authRoutes from "./routes/authRoutes.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
 import trackingRoutes from "./routes/trackingRoutes.js";
 import detectorRoutes from "./routes/detectorRoutes.js";
-import path from "path";
 import reportRoutes from "./routes/reportRoutes.js";
 import userTaskRoutes from "./routes/userTaskRoutes.js";
 import assignmentRoutes from "./routes/assignmentRoutes.js";
 import hackathonRoutes from "./routes/hackathonRoutes.js";
 import reminderRoutes from "./routes/reminderRoutes.js";
-import { fileURLToPath } from "url";
 
 dotenv.config();
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const httpServer = createServer(app);
 
-const httpServer = createServer(app); // Create an HTTP server
-const io = new Server(httpServer, {
-  cors: {
-    origin: "https://studybuddy-zeta-one.vercel.app",
-    methods: ["GET", "POST"],
-  },
-});
+// ===== ENV VARIABLES =====
+const PORT = process.env.PORT || 6000;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
+// ===== CORS SETUP =====
 app.use(
   cors({
-    origin: "https://studybuddy-zeta-one.vercel.app", // frontend ka port (vite)
+    origin: FRONTEND_URL,
     credentials: true,
   })
 );
-app.use("/api/tracking", trackingRoutes);
 
-// Routes
+// ===== SOCKET.IO =====
+const io = new Server(httpServer, {
+  cors: {
+    origin: FRONTEND_URL,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// ===== MIDDLEWARE =====
+app.use(express.json());
+app.use(cookieParser());
+
+// ===== ROUTES =====
 app.use("/api/auth", authRoutes);
-
+app.use("/api/tracking", trackingRoutes);
 app.use("/api/detector", detectorRoutes);
-// app.use("/api/detector", detectorControlRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/user-tasks", userTaskRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/hackathons", hackathonRoutes);
 app.use("/api/reminders", reminderRoutes);
 
-app.use(
-  "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
-);
+// ===== STATIC UPLOADS =====
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// Connect DB and start server
-const PORT = process.env.PORT || 6000;
+// ===== HEALTH ROUTE =====
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
 
+// ===== START SERVER =====
 const startServer = async () => {
   try {
-    await connectDB(); // MongoDB connect
+    await connectDB();
     console.log("✅ MongoDB Connected");
 
-    // === ADD THIS LINE HERE ===
-    // This activates the socket logic from your routes file.
-
-
     httpServer.listen(PORT, () => {
-      console.log(`✅ Server running on http://localhost:${PORT}`);
+      console.log(`✅ Server running on port ${PORT}`);
     });
   } catch (error) {
     console.error("❌ Server startup failed:", error);

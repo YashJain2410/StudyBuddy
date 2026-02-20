@@ -11,8 +11,8 @@ const generateToken = (userId, res) => {
   // Store token in cookie
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false, // change to true in production
-    sameSite: "lax",
+    secure: true, // change to true in production
+    sameSite: "None",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
