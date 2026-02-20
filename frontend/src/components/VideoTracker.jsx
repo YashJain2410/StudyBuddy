@@ -1777,7 +1777,24 @@ export default function VideoTracker() {
 
 
   return (
-    <div style={{ ...styles.page, padding: 0 }}>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-100 via-purple-200 to-pink-100 relative overflow-hidden text-gray-800">
+      {/* Glittery Particle Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {Array.from({ length: 80 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute bg-white rounded-full opacity-20 animate-pulse"
+            style={{
+              width: `${Math.random() * 3 + 2}px`,
+              height: `${Math.random() * 3 + 2}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animationDuration: `${Math.random() * 4 + 2}s`,
+            }}
+          ></div>
+        ))}
+      </div>
+
       {/* Navbar */}
       <nav className="bg-white/30 backdrop-blur-lg shadow-lg py-4 px-8 flex justify-between items-center sticky top-0 z-50 rounded-b-2xl">
         <Link
@@ -1845,7 +1862,7 @@ export default function VideoTracker() {
         )}
       </nav>
 
-      <div style={{ ...styles.container, padding: "24px" }}>
+      <div className="relative z-10 w-full max-w-full m-0 flex flex-col gap-6 p-6">
         <div style={styles.header}>
           <h1 style={styles.title}>Study Video Tracker</h1>
           <div style={styles.wallet}>
@@ -2374,11 +2391,12 @@ export default function VideoTracker() {
                   <div
                     key={i}
                     style={{
-                      background: "#ffffff",
-                      borderRadius: "10px",
+                      background: "rgba(255, 255, 255, 0.4)",
+                      backdropFilter: "blur(8px)",
+                      borderRadius: "15px",
                       padding: "12px",
-                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.08)",
-                      border: "1px solid #e5e7eb",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
                       display: "flex",
                       flexDirection: "column",
                       transition: "all 0.2s ease",
@@ -2565,9 +2583,11 @@ export default function VideoTracker() {
         >
           <div
             style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "12px",
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+              backdropFilter: "blur(16px)",
+              borderRadius: "24px",
               boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
               maxWidth: "600px",
               width: "100%",
               maxHeight: "80vh",
@@ -2708,29 +2728,56 @@ export default function VideoTracker() {
 
 // Basic styles to make the component runnable
 const styles = {
+  page: { width: '100vw', minHeight: '100vh', boxSizing: 'border-box', fontFamily: 'sans-serif' },
 
-  page: { background: '#f3f4f6', width: '100vw', minHeight: '100vh', padding: '24px', boxSizing: 'border-box', fontFamily: 'sans-serif' },
   container: { width: '100%', maxWidth: '100%', margin: '0', display: 'flex', flexDirection: 'column', gap: '24px' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   title: {
     fontSize: "2.5rem",
     fontWeight: "800",
-    background: "linear-gradient(to right, #6366f1, #ec4899)",
+    background: "linear-gradient(to right, #4338ca, #7e22ce, #db2777)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     margin: 0,
     fontFamily: "'Inter', sans-serif",
   },
   wallet: { display: 'flex', gap: '12px' },
-  statChip: { background: '#fff', padding: '8px 12px', borderRadius: '16px', fontSize: '14px', fontWeight: '500', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' },
-  panel: { background: '#fff', padding: '24px', borderRadius: '12px', boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)' },
+  statChip: { background: 'rgba(255, 255, 255, 0.4)', backdropFilter: 'blur(8px)', padding: '8px 16px', borderRadius: '16px', fontSize: '14px', fontWeight: '600', border: '1px solid rgba(255, 255, 255, 0.3)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)' },
+  panel: {
+    background: 'rgba(255, 255, 255, 0.3)',
+    backdropFilter: 'blur(16px)',
+    padding: '24px',
+    borderRadius: '24px',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    boxShadow: '0 10px 32px rgba(0, 0, 0, 0.1)'
+  },
   input: { flexGrow: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '1em' },
   button: { padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#4f46e5', color: 'white', fontSize: '1em', cursor: 'pointer' },
   secondaryButton: { background: '#e5e7eb', color: '#111827' },
   sectionTitle: { fontSize: '1.25em', color: '#111827', margin: '0 0 16px 0' },
   popup: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 100 },
-  popupInner: { background: 'white', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' },
-  maximizedPopupInner: { background: 'white', padding: '24px', borderRadius: '12px', width: '80vw', height: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' },
+  popupInner: {
+    background: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(12px)',
+    padding: '24px',
+    borderRadius: '24px',
+    width: '90%',
+    maxWidth: '400px',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    boxShadow: '0 10px 32px rgba(0, 0, 0, 0.1)'
+  },
+  maximizedPopupInner: {
+    background: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(16px)',
+    padding: '24px',
+    borderRadius: '24px',
+    width: '80vw',
+    height: '80vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    border: '1px solid rgba(255, 255, 255, 0.3)'
+  },
   popupTitle: { fontSize: '1.5em', margin: '0 0 16px 0' },
   focusInputContainer: { display: 'flex', alignItems: 'center', gap: '12px' },
   popupText: { color: '#4b5563', lineHeight: 1.5, marginTop: '16px' },
@@ -2753,7 +2800,17 @@ const styles = {
     lineHeight: '1.6',
   },
 
-  placeholder: { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', background: '#f9fafb', borderRadius: '8px', color: '#6b7280' },
+  placeholder: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '200px',
+    background: 'rgba(255, 255, 255, 0.2)',
+    backdropFilter: 'blur(4px)',
+    borderRadius: '24px',
+    color: '#4b5563',
+    border: '1px solid rgba(255, 255, 255, 0.1)'
+  },
   tooltip: { background: '#fff', border: '1px solid #d1d5db', padding: '8px', borderRadius: '8px' },
   warningBanner: {
     position: "fixed",
@@ -2788,13 +2845,15 @@ const blockedStyles = {
   },
 
   popup: {
-    background: "rgba(255,255,255,0.95)",
+    background: "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(12px)",
     padding: "24px",
     width: "90%",
     maxWidth: "380px",
-    borderRadius: "16px",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+    borderRadius: "24px",
+    boxShadow: "0 10px 32px rgba(0, 0, 0, 0.15)",
     textAlign: "center",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
   },
 
   title: {
@@ -2826,11 +2885,12 @@ const blockedStyles = {
 
 const stylesNotes = {
   panel: {
-    background: "linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%)",
+    background: "rgba(255, 255, 255, 0.3)",
+    backdropFilter: "blur(16px)",
     padding: "22px",
-    borderRadius: "16px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 4px 18px rgba(0,0,0,0.05)",
+    borderRadius: "24px",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    boxShadow: "0 10px 32px rgba(0,0,0,0.1)",
   },
 
   heading: {
@@ -2896,11 +2956,12 @@ const stylesNotes = {
 
 const stickyNotes = {
   panel: {
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.3)",
+    backdropFilter: "blur(16px)",
     padding: "22px",
-    borderRadius: "16px",
-    border: "1px solid #e5e7eb",
-    boxShadow: "0 4px 18px rgba(0,0,0,0.05)",
+    borderRadius: "24px",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    boxShadow: "0 10px 32px rgba(0, 0, 0, 0.1)",
   },
 
   heading: {
@@ -2925,12 +2986,14 @@ const stickyNotes = {
 
   stickyCard: {
     position: "relative",
-    background: "#fff8a8",
+    background: "rgba(255, 255, 255, 0.4)",
+    backdropFilter: "blur(12px)",
     padding: "20px",
     height: "600px",          // ✅ fixed height
     width: "100%",
-    borderRadius: "10px",
-    fontFamily: "'Patrick Hand', cursive, sans-serif",
+    borderRadius: "24px",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    fontFamily: "'Inter', sans-serif",
     fontSize: "1.1rem",
     color: "#374151",
     lineHeight: "1.6",
@@ -2939,9 +3002,8 @@ const stickyNotes = {
     overflowY: "auto",        // ✅ scroll inside
     overflowX: "hidden",
 
-    // Sticky note shadow + tilt
-    boxShadow: "0 10px 18px rgba(0,0,0,0.12)",
-    transform: "rotate(-1.5deg)",
+    // Sticky note shadow
+    boxShadow: "0 10px 32px rgba(0,0,0,0.1)",
   },
 
 
