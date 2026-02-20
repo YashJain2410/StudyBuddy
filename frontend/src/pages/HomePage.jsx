@@ -10,7 +10,7 @@ import chatAnimation from "../assets/chatAnimation.json";
 import ankit from "../assets/ankit1.jpeg"
 import anshika from "../assets/anshika1.jpeg"
 import ananya from "../assets/ananya1.jpeg"
-import setu from "../assets/setu1.jpeg"
+import setu from "../assets/Setu1.jpeg"
 import yash from "../assets/yash.jpeg"
 
 
