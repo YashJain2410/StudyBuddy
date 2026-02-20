@@ -17,12 +17,6 @@ import hackathonRoutes from "./routes/hackathonRoutes.js";
 import reminderRoutes from "./routes/reminderRoutes.js";
 import { fileURLToPath } from "url";
 
-
-
-
-
-
-
 dotenv.config();
 
 const app = express();
@@ -32,7 +26,7 @@ const __dirname = path.dirname(__filename);
 const httpServer = createServer(app); // Create an HTTP server
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: "https://studybuddy-zeta-one.vercel.app",
     methods: ["GET", "POST"],
   },
 });
@@ -42,7 +36,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend ka port (vite)
+    origin: "https://studybuddy-zeta-one.vercel.app", // frontend ka port (vite)
     credentials: true,
   })
 );
