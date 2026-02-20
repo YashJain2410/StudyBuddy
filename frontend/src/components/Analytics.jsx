@@ -124,6 +124,7 @@
 
 
 import React, { useEffect, useState } from "react";
+import { apiFetch } from "../utils/api";
 
 const Analytics = () => {
   const [pdfReports, setPdfReports] = useState([]);
@@ -132,7 +133,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await fetch("/api/reports/my"); // 🔥 simple call
+        const res = await apiFetch("/api/reports/my"); // 🔥 simple call
 
         const data = await res.json();
 

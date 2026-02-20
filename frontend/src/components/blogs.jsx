@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppContext } from "../context/AppContext";
 import profileIcon from '../assets/profile_icon.png';
+import { apiFetch } from "../utils/api";
 
 const initialBlogPosts = [
     {
@@ -90,7 +91,7 @@ const Blog = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await fetch("/api/auth/logout", {
+            const res = await apiFetch("/api/auth/logout", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

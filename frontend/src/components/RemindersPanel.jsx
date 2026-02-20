@@ -1,4 +1,6 @@
 import { useAppContext } from "../context/AppContext";
+import { apiFetch } from "../utils/api";
+
 
 const RemindersPanel = () => {
   const {
@@ -13,7 +15,7 @@ const RemindersPanel = () => {
     if (newReminderTitle.trim() && reminderTime) {
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch("/api/reminders/add", {
+        const res = await apiFetch("/api/reminders/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -36,7 +38,7 @@ const RemindersPanel = () => {
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`/api/reminders/${id}`, {
+      const res = await apiFetch(`/api/reminders/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

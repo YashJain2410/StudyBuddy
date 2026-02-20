@@ -43,5 +43,5 @@
     "tailwindcss": "^4.1.17",
     "vite": "^7.1.2"
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "https://studybuddy-01n7.onrender.com"
 }

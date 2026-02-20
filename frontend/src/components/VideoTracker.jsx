@@ -7,9 +7,7 @@ import { jsPDF } from "jspdf";
 import { Link, useNavigate } from "react-router-dom";
 import profileIcon from '../assets/profile_icon.png';
 import AuthModal from "./AuthModal";
-
-
-
+import { apiFetch } from "../utils/api";
 
 
 import {
@@ -92,7 +90,7 @@ const ALLOWED_KEYWORDS = [
 
 async function isStudyVideo(videoId) {
   try {
-    const res = await fetch(
+    const res = await apiFetch(
       `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`
     );
     const data = await res.json();
@@ -124,7 +122,7 @@ async function isStudyVideo(videoId) {
 
 const updateVideosSwitched = async (userId) => {
   try {
-    const res = await fetch("/api/tracking/videos-switched", {
+    const res = await apiFetch("/api/tracking/videos-switched", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -164,7 +162,7 @@ export default function VideoTracker() {
   // --- UTILITY FUNCTIONS ---
   const updateBackendCoins = async (loss) => {
     try {
-      const res = await fetch(`/api/tracking/coins-loss`, {
+      const res = await apiFetch(`/api/tracking/coins-loss`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -181,7 +179,7 @@ export default function VideoTracker() {
 
   const updateBackendCoinsGain = async (gain) => {
     try {
-      const res = await fetch(`/api/tracking/coins-gain`, {
+      const res = await apiFetch(`/api/tracking/coins-gain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -199,7 +197,7 @@ export default function VideoTracker() {
   const updateVideosWatched = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/tracking/videos-watched", {
+      const res = await apiFetch("/api/tracking/videos-watched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -237,7 +235,7 @@ export default function VideoTracker() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("/api/auth/logout", {
+      const res = await apiFetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -324,7 +322,7 @@ export default function VideoTracker() {
 
   //    const saveDetectionToBackend = async (payloadObj) => {
   //   try {
-  //     await fetch("/api/detections/save", {
+  //     await apiFetch("/api/detections/save", {
   //       method: "POST",
   //       headers: { "Content-Type": "application/json" },
   //       credentials: "include", // ⭐ cookie token ke liye must
@@ -347,9 +345,9 @@ export default function VideoTracker() {
   const toggleDetector = async () => {
     try {
       if (!showCameraAnalysis) {
-        await fetch("/api/detector/start", { method: "POST" });
+        await apiFetch("/api/detector/start", { method: "POST" });
       } else {
-        await fetch("/api/detector/stop", { method: "POST" });
+        await apiFetch("/api/detector/stop", { method: "POST" });
       }
 
       setShowCameraAnalysis((prev) => !prev);
@@ -469,7 +467,7 @@ export default function VideoTracker() {
   // if (!user) return;
 
   //   try {
-  //     const res = await fetch(`/api/tracking/coins/${user._id || user.id}`);
+  //     const res = await apiFetch(`/api/tracking/coins/${user._id || user.id}`);
   //     if (!res.ok) throw new Error("Failed to fetch coins");
   //     const data = await res.json();
 
@@ -491,7 +489,7 @@ export default function VideoTracker() {
       if (!user) return;
 
       try {
-        const res = await fetch(`/api/tracking/coins/${user._id || user.id}`);
+        const res = await apiFetch(`/api/tracking/coins/${user._id || user.id}`);
         if (!res.ok) throw new Error("Failed to fetch user stats");
         const data = await res.json();
 
@@ -523,7 +521,7 @@ export default function VideoTracker() {
       if (!userId) return;
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("/api/tracking/notes-tags", {
+        const res = await apiFetch("/api/tracking/notes-tags", {
           headers: {
             Authorization: token ? `Bearer ${token}` : undefined,
           },
@@ -596,7 +594,7 @@ export default function VideoTracker() {
       if (!token) return;
 
       try {
-        const res = await fetch("/api/tracking/history", {
+        const res = await apiFetch("/api/tracking/history", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -1479,7 +1477,7 @@ export default function VideoTracker() {
       });
 
       // ✅ Send ALL data including notes + tag in ONE request
-      const response = await fetch("/api/tracking/add-history", {
+      const response = await apiFetch("/api/tracking/add-history", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1680,7 +1678,7 @@ export default function VideoTracker() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/tracking/save-note-tag", {
+      const res = await apiFetch("/api/tracking/save-note-tag", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

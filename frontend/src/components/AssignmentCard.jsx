@@ -334,6 +334,7 @@ import {
 } from "recharts";
 import { useAppContext } from "../context/AppContext";
 import profileIcon from '../assets/profile_icon.png';
+import { apiFetch } from "../utils/api";
 
 const AssignmentCard = () => {
   const {
@@ -372,7 +373,7 @@ const AssignmentCard = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("/api/auth/logout", {
+      const res = await apiFetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -462,7 +463,7 @@ const AssignmentCard = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/assignments/add", {
+      const res = await apiFetch("/api/assignments/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -489,7 +490,7 @@ const AssignmentCard = () => {
     if (!newHackathon.title || !newHackathon.date) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/hackathons/add", {
+      const res = await apiFetch("/api/hackathons/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -512,7 +513,7 @@ const AssignmentCard = () => {
     if (!newReminder.title || !newReminder.time) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/reminders/add", {
+      const res = await apiFetch("/api/reminders/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -535,7 +536,7 @@ const AssignmentCard = () => {
     try {
       const token = localStorage.getItem("token");
       const url = type === "assignment" ? `/api/assignments/${id}/status` : `/api/hackathons/${id}/status`;
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -567,7 +568,7 @@ const AssignmentCard = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`/api/reminders/${unifiedId}`, {
+      const res = await apiFetch(`/api/reminders/${unifiedId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

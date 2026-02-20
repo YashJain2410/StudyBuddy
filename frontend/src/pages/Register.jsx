@@ -31,7 +31,7 @@ const Register = () => {
   const handleSignup = async (e) => {
   e.preventDefault();
   try {
-    const res = await fetch("/api/auth/signup", {
+    const res = await apiFetch("/api/auth/signup", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

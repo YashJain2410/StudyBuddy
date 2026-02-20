@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     try {
       // Relative API path, proxy handle karega
-      const res = await fetch("/api/auth/login", {
+      const res = await apiFetch("/api/auth/login", {
         method: "POST",
         credentials: "include", // cookie support
         headers: { "Content-Type": "application/json" },
