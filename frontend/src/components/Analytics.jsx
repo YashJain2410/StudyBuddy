@@ -135,7 +135,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await apiFetch(`${API}/api/reports/my`); // 🔥 simple call
+        const res = await apiFetch("/api/reports/my"); // 🔥 simple call
 
         const data = await res.json();
 
@@ -206,14 +206,14 @@ const Analytics = () => {
             <p className="text-sm text-gray-600 mb-4">
               📁 Format: PDF
             </p>
-<a
-  href={pdf.fileUrl}   // ✅ BAS ITNA
-  target="_blank"
-  rel="noreferrer"
-  className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-lg text-white font-medium shadow-md hover:shadow-lg transition"
->
-  View PDF
-</a>
+            <a
+              href={pdf.fileUrl}   // ✅ BAS ITNA
+              target="_blank"
+              rel="noreferrer"
+              className="inline-block px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 rounded-lg text-white font-medium shadow-md hover:shadow-lg transition"
+            >
+              View PDF
+            </a>
 
           </div>
         ))}

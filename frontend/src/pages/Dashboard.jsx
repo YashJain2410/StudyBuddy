@@ -33,7 +33,7 @@ const Dashboard = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const res = await apiFetch(`${API}/api/tracking/monthly-activity`, {
+      const res = await apiFetch("/api/tracking/monthly-activity", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -57,7 +57,7 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await apiFetch(`${API}/api/auth/logout`, {
+      const res = await apiFetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -93,7 +93,7 @@ const Dashboard = () => {
     );
 
   // 🔥 FINAL FIX (Backend + Local History Merge — Correct Way)
- 
+
   const finalActivity = { ...monthlyActivity };
 
   // Add watched time from history
@@ -106,7 +106,7 @@ const Dashboard = () => {
 
     finalActivity[dayKey].totalSeconds += h.secondsWatched || 0;
   });
- 
+
 
   // Full Month Days
   const now = new Date();

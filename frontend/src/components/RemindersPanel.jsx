@@ -18,7 +18,7 @@ const RemindersPanel = () => {
     if (newReminderTitle.trim() && reminderTime) {
       const token = localStorage.getItem("token");
       try {
-        const res = await apiFetch(`${API}/api/reminders/add`, {
+        const res = await apiFetch("/api/reminders/add", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

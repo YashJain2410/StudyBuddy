@@ -53,7 +53,7 @@ const AssignmentCard = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await apiFetch(`${API}/api/auth/logout`, {
+      const res = await apiFetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -143,7 +143,7 @@ const AssignmentCard = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await apiFetch(`${API}/api/assignments/add`, {
+      const res = await apiFetch("/api/assignments/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +170,7 @@ const AssignmentCard = () => {
     if (!newHackathon.title || !newHackathon.date) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await apiFetch(`${API}/api/hackathons/add`, {
+      const res = await apiFetch("/api/hackathons/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -193,7 +193,7 @@ const AssignmentCard = () => {
     if (!newReminder.title || !newReminder.time) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await apiFetch(`${API}/api/reminders/add`, {
+      const res = await apiFetch("/api/reminders/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

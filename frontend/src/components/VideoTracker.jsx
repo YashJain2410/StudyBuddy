@@ -121,7 +121,7 @@ async function isStudyVideo(videoId) {
 
 const updateVideosSwitched = async (userId) => {
   try {
-    const res = await apiFetch(`${API}/api/tracking/videos-switched`, {
+    const res = await apiFetch("/api/tracking/videos-switched", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -196,7 +196,7 @@ export default function VideoTracker() {
   const updateVideosWatched = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await apiFetch(`${API}/api/tracking/videos-watched`, {
+      const res = await apiFetch("/api/tracking/videos-watched", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -234,7 +234,7 @@ export default function VideoTracker() {
 
   const handleLogout = async () => {
     try {
-      const res = await apiFetch(`${API}/api/auth/logout`, {
+      const res = await apiFetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -321,7 +321,7 @@ export default function VideoTracker() {
 
   //    const saveDetectionToBackend = async (payloadObj) => {
   //   try {
-  //     await apiFetch(`${API}/api/detections/save", {
+  //     await apiFetch("/api/detections/save", {
   //       method: "POST",
   //       headers: { "Content-Type": "application/json" },
   //       credentials: "include", // ⭐ cookie token ke liye must
@@ -344,9 +344,9 @@ export default function VideoTracker() {
   const toggleDetector = async () => {
     try {
       if (!showCameraAnalysis) {
-        await apiFetch(`${API}/api/detector/start`, { method: "POST" });
+        await apiFetch("/api/detector/start", { method: "POST" });
       } else {
-        await apiFetch(`${API}/api/detector/stop`, { method: "POST" });
+        await apiFetch("/api/detector/stop", { method: "POST" });
       }
 
       setShowCameraAnalysis((prev) => !prev);
@@ -520,7 +520,7 @@ export default function VideoTracker() {
       if (!userId) return;
       try {
         const token = localStorage.getItem("token");
-        const res = await apiFetch(`${API}/api/tracking/notes-tags`, {
+        const res = await apiFetch("/api/tracking/notes-tags", {
           headers: {
             Authorization: token ? `Bearer ${token}` : undefined,
           },
@@ -593,7 +593,7 @@ export default function VideoTracker() {
       if (!token) return;
 
       try {
-        const res = await apiFetch(`${API}/api/tracking/history`, {
+        const res = await apiFetch("/api/tracking/history", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -1476,7 +1476,7 @@ export default function VideoTracker() {
       });
 
       // ✅ Send ALL data including notes + tag in ONE request
-      const response = await apiFetch(`${API}/api/tracking/add-history`, {
+      const response = await apiFetch("/api/tracking/add-history", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1677,7 +1677,7 @@ export default function VideoTracker() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await apiFetch(`${API}/api/tracking/save-note-tag`, {
+      const res = await apiFetch("/api/tracking/save-note-tag", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

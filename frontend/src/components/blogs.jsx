@@ -93,7 +93,7 @@ const Blog = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await apiFetch(`${API}/api/auth/logout`, {
+            const res = await apiFetch("/api/auth/logout", {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

@@ -9,7 +9,7 @@ import { apiFetch } from "../utils/api";
 const Register = () => {
   const navigate = useNavigate();
   const { setAppState } = useAppContext(); // ✅ context updater
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: "",
@@ -33,38 +33,38 @@ const Register = () => {
 
   // Handle form submit
   const handleSignup = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await apiFetch(`${API}/api/auth/signup`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    e.preventDefault();
+    try {
+      const res = await apiFetch("/api/auth/signup", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      localStorage.setItem("user", JSON.stringify(data.user));
+      if (res.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-      setAppState({ coins: data.user.coins || 50, streak: data.user.streak || 0, name: data.user.name, email: data.user.email, });
-      
-      // 🎉 Welcome bonus alert
-      if (data.user.coins === 500) {
-        alert("Welcome! You’ve received 500 bonus coins 🎊");
+        setAppState({ coins: data.user.coins || 50, streak: data.user.streak || 0, name: data.user.name, email: data.user.email, });
+
+        // 🎉 Welcome bonus alert
+        if (data.user.coins === 500) {
+          alert("Welcome! You’ve received 500 bonus coins 🎊");
+        } else {
+          alert("Register Successful");
+        }
+
+        navigate("/"); // redirect to home or dashboard
       } else {
-        alert("Register Successful");
+        alert(data.message);
       }
-
-      navigate("/"); // redirect to home or dashboard
-    } else {
-      alert(data.message);
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
     }
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  }
-};
+  };
 
 
   return (
