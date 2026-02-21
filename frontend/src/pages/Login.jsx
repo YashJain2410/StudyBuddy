@@ -4,9 +4,6 @@ import { useAppContext } from "../context/AppContext";
 import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "../utils/api";
 
-const API = import.meta.env.VITE_API_URL;
-
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +16,7 @@ const Login = () => {
     e.preventDefault();
     try {
       // Relative API path, proxy handle karega
-      const res = await apiFetch(`${API}/api/auth/login`, {
+      const res = await apiFetch(`/api/auth/login`, {
         method: "POST",
         credentials: "include", // cookie support
         headers: { "Content-Type": "application/json" },
